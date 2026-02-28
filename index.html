@@ -1,0 +1,1386 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrustMed - Planeador de Contenidos Facebook</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+        :root {
+            --navy: #03045E; --blue: #0077B6; --indigo: #4F46E5; --sky: #00B4D8;
+            --light: #EEF2FF; --white: #FFFFFF;
+            --g50: #F8FAFC; --g100: #F1F5F9; --g200: #E2E8F0; --g300: #CBD5E1;
+            --g400: #94A3B8; --g500: #64748B; --g600: #475569; --g700: #334155;
+            --g800: #1E293B; --g900: #0F172A;
+            --green: #10B981; --green-bg: #ECFDF5;
+            --red: #EF4444; --red-bg: #FEF2F2;
+            --amber: #F59E0B; --amber-bg: #FFFBEB;
+            --purple: #8B5CF6; --purple-bg: #F5F3FF;
+            --seg-a: #2563EB; --seg-a-bg: #EFF6FF;
+            --seg-b: #DC2626; --seg-b-bg: #FEF2F2;
+            --seg-c: #7C3AED; --seg-c-bg: #F5F3FF;
+            --sidebar-w: 270px; --radius: 14px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', system-ui, sans-serif; background: var(--g100); color: var(--g800); line-height: 1.6; overflow: hidden; height: 100vh; }
+        .app { display: flex; height: 100vh; }
+
+        /* SIDEBAR */
+        .sidebar { width: var(--sidebar-w); min-width: var(--sidebar-w); background: var(--g900); color: white; display: flex; flex-direction: column; overflow: hidden; flex-shrink: 0; }
+        .sidebar-brand { padding: 1.25rem 1rem; border-bottom: 1px solid rgba(255,255,255,0.08); }
+        .sidebar-brand h1 { font-size: 1.1rem; font-weight: 800; display: flex; align-items: center; gap: 0.5rem; }
+        .sidebar-brand .logo-icon { width: 34px; height: 34px; background: linear-gradient(135deg, var(--indigo), var(--sky)); border-radius: 9px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 0.8rem; flex-shrink: 0; }
+        .sidebar-brand p { font-size: 0.7rem; color: var(--g400); margin-top: 0.2rem; padding-left: 2.6rem; }
+        .sidebar-section-label { font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--g500); padding: 1rem 1rem 0.4rem; }
+        .sidebar-nav { flex: 1; overflow-y: auto; padding: 0 0.5rem 1rem; scrollbar-width: thin; scrollbar-color: var(--g700) transparent; }
+        .nav-btn { display: flex; align-items: center; gap: 0.65rem; width: 100%; padding: 0.6rem 0.65rem; border: none; background: transparent; color: var(--g400); font-size: 0.8rem; font-weight: 500; cursor: pointer; border-radius: 9px; transition: all 0.15s; text-align: left; font-family: inherit; margin-bottom: 2px; }
+        .nav-btn:hover { background: rgba(255,255,255,0.06); color: var(--g200); }
+        .nav-btn.active { background: var(--indigo); color: white; font-weight: 600; box-shadow: 0 4px 12px rgba(79,70,229,0.4); }
+        .nav-dot { width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.68rem; flex-shrink: 0; }
+        .nav-btn.active .nav-dot { background: rgba(255,255,255,0.2); }
+        .nav-label { flex: 1; }
+        .nav-label small { display: block; font-size: 0.65rem; font-weight: 400; opacity: 0.6; margin-top: 1px; }
+        .nav-btn.active .nav-label small { opacity: 0.8; }
+        .dot-fb { background: #1877F2; } .dot-lun { background: #1E40AF; } .dot-mar { background: #7C3AED; }
+        .dot-mie { background: #059669; } .dot-jue { background: #0891B2; } .dot-vie { background: #DC2626; }
+        .dot-sab { background: #D97706; } .dot-dom { background: #4F46E5; } .dot-res { background: var(--g600); }
+
+        /* MAIN */
+        .main { flex: 1; overflow-y: auto; scroll-behavior: smooth; }
+        .main-inner { max-width: 920px; margin: 0 auto; padding: 1.5rem 2rem 4rem; }
+
+        /* PAGE HEADER */
+        .page-header { margin-bottom: 1.5rem; }
+        .page-header .breadcrumb { font-size: 0.72rem; color: var(--g400); margin-bottom: 0.5rem; font-weight: 500; }
+        .page-header h2 { font-size: 1.6rem; font-weight: 800; color: var(--g900); line-height: 1.2; }
+        .page-header .subtitle { font-size: 0.88rem; color: var(--g500); margin-top: 0.3rem; }
+        .page-header-meta { display: flex; gap: 0.5rem; margin-top: 0.8rem; flex-wrap: wrap; }
+        .pill { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.35rem 0.75rem; border-radius: 20px; font-size: 0.72rem; font-weight: 600; }
+        .pill-time { background: var(--green-bg); color: #065F46; }
+        .pill-format { background: var(--purple-bg); color: #5B21B6; }
+
+        /* SEGMENT TABS */
+        .seg-tabs { display: flex; gap: 0.5rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+        .seg-tab { padding: 0.55rem 1rem; border-radius: 10px; border: 2px solid var(--g200); background: var(--white); font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: all 0.15s; font-family: inherit; display: flex; align-items: center; gap: 0.4rem; }
+        .seg-tab:hover { border-color: var(--g300); }
+        .seg-tab.active-a { border-color: var(--seg-a); background: var(--seg-a-bg); color: var(--seg-a); }
+        .seg-tab.active-b { border-color: var(--seg-b); background: var(--seg-b-bg); color: var(--seg-b); }
+        .seg-tab.active-c { border-color: var(--seg-c); background: var(--seg-c-bg); color: var(--seg-c); }
+        .seg-dot { width: 8px; height: 8px; border-radius: 50%; }
+        .seg-dot-a { background: var(--seg-a); } .seg-dot-b { background: var(--seg-b); } .seg-dot-c { background: var(--seg-c); }
+
+        /* SECTION BLOCK */
+        .section-block { background: var(--white); border: 1px solid var(--g200); border-radius: var(--radius); margin-bottom: 1rem; overflow: hidden; }
+        .section-head { display: flex; align-items: center; justify-content: space-between; padding: 0.85rem 1.25rem; border-bottom: 1px solid var(--g100); gap: 0.5rem; }
+        .section-head h3 { font-size: 0.82rem; font-weight: 700; color: var(--g700); display: flex; align-items: center; gap: 0.4rem; }
+        .section-body { padding: 1rem 1.25rem; }
+
+        /* COPY & PROMPT */
+        .copy-display { background: var(--g50); border: 1px solid var(--g200); border-radius: 10px; padding: 1.25rem; font-size: 0.86rem; line-height: 1.8; color: var(--g700); white-space: pre-wrap; word-wrap: break-word; }
+        .copy-display strong { color: var(--g900); }
+        .prompt-display { background: var(--g900); color: #CBD5E1; border-radius: 10px; padding: 1.25rem; font-size: 0.78rem; line-height: 1.7; font-family: 'Cascadia Code','Fira Code','Consolas', monospace; white-space: pre-wrap; word-wrap: break-word; }
+
+        /* CUANDO USAR */
+        .cuando-usar { padding: 0.85rem 1rem; border-radius: 10px; font-size: 0.82rem; line-height: 1.6; margin-bottom: 1rem; display: flex; gap: 0.6rem; align-items: flex-start; }
+        .cuando-usar.type-a { background: var(--seg-a-bg); border: 1px solid #BFDBFE; color: #1E40AF; }
+        .cuando-usar.type-b { background: var(--seg-b-bg); border: 1px solid #FECACA; color: #991B1B; }
+        .cuando-usar.type-c { background: var(--seg-c-bg); border: 1px solid #DDD6FE; color: #5B21B6; }
+        .cuando-icon { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+
+        /* COPY BTN */
+        .copy-btn { display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.35rem 0.8rem; border-radius: 7px; border: 1px solid var(--g200); background: var(--white); color: var(--g500); font-size: 0.72rem; font-weight: 600; cursor: pointer; transition: all 0.15s; font-family: inherit; flex-shrink: 0; }
+        .copy-btn:hover { background: var(--indigo); color: white; border-color: var(--indigo); }
+        .copy-btn.copied { background: var(--green); color: white; border-color: var(--green); }
+
+        /* FB CONFIG */
+        .fb-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 0.75rem; }
+        .fb-field { background: var(--g50); border: 1px solid var(--g200); border-radius: 10px; padding: 1rem; position: relative; }
+        .fb-field label { display: block; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--g400); margin-bottom: 0.35rem; }
+        .fb-field .val { font-size: 0.88rem; color: var(--g800); font-weight: 500; line-height: 1.5; }
+        .fb-field .val.big { font-size: 1.05rem; font-weight: 700; color: var(--navy); }
+        .fb-field .copy-btn { position: absolute; top: 0.55rem; right: 0.55rem; }
+        .full-span { grid-column: 1 / -1; }
+
+        /* RESUMEN TABLE */
+        .sum-table { width: 100%; border-collapse: separate; border-spacing: 0; border-radius: 10px; overflow: hidden; border: 1px solid var(--g200); font-size: 0.8rem; }
+        .sum-table th { background: var(--g900); color: white; padding: 0.7rem 0.85rem; text-align: left; font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; }
+        .sum-table td { padding: 0.65rem 0.85rem; border-bottom: 1px solid var(--g100); }
+        .sum-table tr:nth-child(even) td { background: var(--g50); }
+        .sum-table tr:last-child td { border-bottom: none; }
+
+        /* SEGMENT CARD */
+        .seg-card { border-radius: 10px; padding: 1rem; margin-bottom: 0.75rem; }
+        .seg-card.seg-a { background: var(--seg-a-bg); border: 1px solid #BFDBFE; }
+        .seg-card.seg-b { background: var(--seg-b-bg); border: 1px solid #FECACA; }
+        .seg-card.seg-c { background: var(--seg-c-bg); border: 1px solid #DDD6FE; }
+        .seg-card h4 { font-size: 0.82rem; font-weight: 700; margin-bottom: 0.3rem; }
+        .seg-card p { font-size: 0.78rem; line-height: 1.5; }
+
+        /* PAGE SECTIONS */
+        .page-section { display: none; }
+        .page-section.active { display: block; }
+
+        /* TOAST */
+        .toast { position: fixed; bottom: 1.5rem; right: 1.5rem; background: var(--g900); color: white; padding: 0.75rem 1.25rem; border-radius: 10px; font-size: 0.82rem; font-weight: 600; transform: translateY(80px); opacity: 0; transition: all 0.3s; z-index: 999; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .toast.show { transform: translateY(0); opacity: 1; }
+
+        /* NOTE BOX */
+        .note-box { display: flex; gap: 0.6rem; align-items: flex-start; padding: 0.85rem 1rem; border-radius: 9px; font-size: 0.8rem; margin-bottom: 1rem; }
+        .note-box.info { background: var(--seg-a-bg); border: 1px solid #BFDBFE; color: #1E40AF; }
+        .note-box.warn { background: var(--amber-bg); border: 1px solid #FCD34D; color: #92400E; }
+
+        /* FORMAT TOGGLE (Post / Reel) */
+        .format-toggle { display: flex; gap: 0.35rem; margin-bottom: 1rem; background: var(--g200); border-radius: 10px; padding: 3px; width: fit-content; }
+        .fmt-btn { padding: 0.45rem 1.1rem; border-radius: 8px; border: none; background: transparent; font-size: 0.78rem; font-weight: 600; cursor: pointer; font-family: inherit; color: var(--g500); transition: all 0.15s; }
+        .fmt-btn.active { background: var(--white); color: var(--g900); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+
+        /* REEL SECTIONS */
+        .reel-hook { background: linear-gradient(135deg, #1E1B4B, #312E81); color: #E0E7FF; border-radius: 10px; padding: 1.15rem; font-size: 1rem; font-weight: 700; line-height: 1.5; margin-bottom: 1rem; position: relative; }
+        .reel-hook::before { content: "HOOK (0-3s)"; position: absolute; top: -8px; left: 12px; background: #F59E0B; color: #1E1B4B; font-size: 0.6rem; font-weight: 800; padding: 2px 8px; border-radius: 4px; letter-spacing: 0.05em; }
+        .reel-timeline { background: var(--g50); border: 1px solid var(--g200); border-radius: 10px; padding: 1rem; }
+        .reel-line { display: flex; gap: 0.75rem; padding: 0.5rem 0; border-bottom: 1px solid var(--g100); font-size: 0.82rem; line-height: 1.6; }
+        .reel-line:last-child { border-bottom: none; }
+        .reel-ts { font-weight: 700; color: var(--indigo); min-width: 52px; flex-shrink: 0; font-size: 0.75rem; padding-top: 2px; }
+        .reel-txt { color: var(--g700); }
+        .reel-video-dir { background: #FFF7ED; border: 1px solid #FED7AA; border-radius: 10px; padding: 1rem; }
+        .reel-video-line { display: flex; gap: 0.75rem; padding: 0.45rem 0; font-size: 0.8rem; line-height: 1.5; color: #9A3412; }
+        .reel-video-ts { font-weight: 700; min-width: 52px; flex-shrink: 0; font-size: 0.72rem; color: #C2410C; }
+        .reel-screen-texts { display: flex; flex-direction: column; gap: 0.35rem; }
+        .reel-screen-item { display: flex; gap: 0.5rem; font-size: 0.8rem; align-items: baseline; }
+        .reel-screen-time { font-weight: 700; color: var(--indigo); min-width: 32px; font-size: 0.72rem; }
+        .reel-screen-val { background: var(--g900); color: white; padding: 0.3rem 0.7rem; border-radius: 6px; font-size: 0.78rem; font-weight: 600; }
+        .reel-cta-box { background: linear-gradient(135deg, var(--indigo), var(--blue)); color: white; border-radius: 10px; padding: 1rem; font-size: 0.88rem; font-weight: 600; line-height: 1.5; }
+        .reel-music { background: var(--amber-bg); border: 1px solid #FCD34D; border-radius: 10px; padding: 0.85rem 1rem; font-size: 0.8rem; color: #92400E; }
+        .reel-badge { display: inline-block; font-size: 0.6rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; padding: 3px 8px; border-radius: 4px; margin-bottom: 0.5rem; }
+        .reel-badge.voice { background: #DBEAFE; color: #1E40AF; }
+        .reel-badge.video { background: #FED7AA; color: #9A3412; }
+        .reel-badge.screen { background: var(--g200); color: var(--g700); }
+        .reel-badge.cta { background: #C7D2FE; color: #3730A3; }
+        .reel-badge.music { background: #FDE68A; color: #92400E; }
+
+        /* PRODUCTION GUIDE */
+        .dot-prod { background: #EC4899; }
+        .prod-check { display: flex; gap: 0.5rem; align-items: flex-start; padding: 0.4rem 0; font-size: 0.82rem; color: var(--g700); }
+        .prod-check::before { content: ""; width: 16px; height: 16px; border: 2px solid var(--g300); border-radius: 4px; flex-shrink: 0; margin-top: 2px; }
+    </style>
+</head>
+<body>
+<div class="app">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <h1><span class="logo-icon">TM</span> TrustMed</h1>
+            <p>Planeador de Contenidos FB</p>
+        </div>
+        <div class="sidebar-section-label">Configuracion</div>
+        <div class="sidebar-nav">
+            <button class="nav-btn active" onclick="showPage('fb-config')">
+                <span class="nav-dot dot-fb">f</span>
+                <span class="nav-label">Pagina Facebook<small>Datos de la pagina</small></span>
+            </button>
+            <div class="sidebar-section-label" style="padding:0.8rem 0.4rem 0.4rem">Contenido Semanal</div>
+            <button class="nav-btn" onclick="showPage('dia-1')">
+                <span class="nav-dot dot-lun">L</span>
+                <span class="nav-label">Lunes<small>Inteligencia de Mercado</small></span>
+            </button>
+            <button class="nav-btn" onclick="showPage('dia-2')">
+                <span class="nav-dot dot-mar">M</span>
+                <span class="nav-label">Martes<small>Alerta Financiera</small></span>
+            </button>
+            <button class="nav-btn" onclick="showPage('dia-3')">
+                <span class="nav-dot dot-mie">Mi</span>
+                <span class="nav-label">Miercoles<small>Caso de Exito</small></span>
+            </button>
+            <button class="nav-btn" onclick="showPage('dia-4')">
+                <span class="nav-dot dot-jue">J</span>
+                <span class="nav-label">Jueves<small>Tip Estrategico</small></span>
+            </button>
+            <button class="nav-btn" onclick="showPage('dia-5')">
+                <span class="nav-dot dot-vie">V</span>
+                <span class="nav-label">Viernes<small>Mito vs Realidad</small></span>
+            </button>
+            <button class="nav-btn" onclick="showPage('dia-6')">
+                <span class="nav-dot dot-sab">S</span>
+                <span class="nav-label">Sabado<small>Herramienta Destacada</small></span>
+            </button>
+            <button class="nav-btn" onclick="showPage('dia-7')">
+                <span class="nav-dot dot-dom">D</span>
+                <span class="nav-label">Domingo<small>Motivacional / Vision</small></span>
+            </button>
+            <div class="sidebar-section-label" style="padding:0.8rem 0.4rem 0.4rem">Guia</div>
+            <button class="nav-btn" onclick="showPage('resumen')">
+                <span class="nav-dot dot-res">R</span>
+                <span class="nav-label">Resumen y Guia<small>Como usar los copys</small></span>
+            </button>
+            <button class="nav-btn" onclick="showPage('produccion')">
+                <span class="nav-dot dot-prod">P</span>
+                <span class="nav-label">Guia Produccion<small>Reels y grabacion</small></span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <div class="main">
+        <div class="main-inner">
+
+<!-- ===================== FB CONFIG ===================== -->
+<div id="fb-config" class="page-section active">
+    <div class="page-header">
+        <div class="breadcrumb">Configuracion &gt; Pagina de Facebook</div>
+        <h2>Datos de la Pagina de Facebook</h2>
+        <p class="subtitle">Usa esta informacion para crear y configurar la pagina oficial de TrustMed en Facebook.</p>
+    </div>
+    <div class="fb-grid">
+        <div class="fb-field">
+            <label>Nombre de la Pagina</label>
+            <div class="val big">TrustMed Colombia</div>
+            <button class="copy-btn" onclick="copyText('TrustMed Colombia', this)">Copiar</button>
+        </div>
+        <div class="fb-field">
+            <label>Nombre de Usuario</label>
+            <div class="val">@TrustMedColombia</div>
+            <button class="copy-btn" onclick="copyText('@TrustMedColombia', this)">Copiar</button>
+        </div>
+        <div class="fb-field">
+            <label>Categoria</label>
+            <div class="val">Software como Servicio (SaaS) / Tecnologia Financiera</div>
+            <button class="copy-btn" onclick="copyText('Software como Servicio (SaaS) / Tecnologia Financiera', this)">Copiar</button>
+        </div>
+        <div class="fb-field">
+            <label>Subcategoria</label>
+            <div class="val">Software de Gestion para Salud</div>
+            <button class="copy-btn" onclick="copyText('Software de Gestion para Salud', this)">Copiar</button>
+        </div>
+        <div class="fb-field full-span">
+            <label>Descripcion Corta (155 caracteres)</label>
+            <div class="val">Plataforma de inteligencia financiera y benchmarking competitivo para consultorios medicos en Colombia. Datos reales. Mejores decisiones.</div>
+            <button class="copy-btn" onclick="copyText('Plataforma de inteligencia financiera y benchmarking competitivo para consultorios medicos en Colombia. Datos reales. Mejores decisiones.', this)">Copiar</button>
+        </div>
+        <div class="fb-field full-span">
+            <label>Descripcion Larga (Acerca de)</label>
+            <div class="val">TrustMed es la plataforma lider de inteligencia financiera y competitiva disenada exclusivamente para consultorios medicos en Colombia y LATAM. Analiza tus pagadores con nuestro Score de Pagador, compara tus precios vs la competencia con Pricing Intelligence, visualiza tu posicion en el mercado con TrustMap, y simula escenarios de crecimiento con datos reales. Deja de adivinar y empieza a decidir con informacion. Tu consultorio merece inteligencia de negocio de primer nivel.</div>
+            <button class="copy-btn" onclick="copyText(this.previousElementSibling.textContent, this)">Copiar</button>
+        </div>
+        <div class="fb-field">
+            <label>Telefono</label>
+            <div class="val">(Por definir)</div>
+        </div>
+        <div class="fb-field">
+            <label>Sitio Web</label>
+            <div class="val">www.trustmed.co</div>
+            <button class="copy-btn" onclick="copyText('www.trustmed.co', this)">Copiar</button>
+        </div>
+        <div class="fb-field">
+            <label>Correo</label>
+            <div class="val">contacto@trustmed.co</div>
+            <button class="copy-btn" onclick="copyText('contacto@trustmed.co', this)">Copiar</button>
+        </div>
+        <div class="fb-field">
+            <label>Ubicacion</label>
+            <div class="val">Colombia (Cobertura Nacional)</div>
+        </div>
+        <div class="fb-field full-span">
+            <label>CTA del Boton Principal</label>
+            <div class="val big">Registrarse &rarr; Link a landing de demo gratuita</div>
+        </div>
+        <div class="fb-field full-span">
+            <label>Hashtags Principales</label>
+            <div class="val">#TrustMed #InteligenciaCompetitiva #FinanzasMedicas #ConsultorioMedico #Benchmarking #PricingIntelligence #MedicinaDigital #Colombia #GestionMedica #MedicosCol</div>
+            <button class="copy-btn" onclick="copyText('#TrustMed #InteligenciaCompetitiva #FinanzasMedicas #ConsultorioMedico #Benchmarking #PricingIntelligence #MedicinaDigital #Colombia #GestionMedica #MedicosCol', this)">Copiar</button>
+        </div>
+    </div>
+</div>
+
+<!-- ===================== DIA 1 - LUNES ===================== -->
+<div id="dia-1" class="page-section">
+    <div class="page-header">
+        <div class="breadcrumb">Contenido Semanal &gt; Lunes</div>
+        <h2>Lunes - Inteligencia de Mercado</h2>
+        <p class="subtitle">Benchmarking y posicionamiento competitivo. Elige la variante segun tu audiencia objetivo.</p>
+        <div class="page-header-meta">
+            <span class="pill pill-time">9:00 AM</span>
+            <span class="pill pill-format">Post con Imagen</span>
+        </div>
+    </div>
+    <div class="seg-tabs">
+        <button class="seg-tab active-a" onclick="showSeg('dia-1','a',this)"><span class="seg-dot seg-dot-a"></span> Doctor Competitivo</button>
+        <button class="seg-tab" onclick="showSeg('dia-1','b',this)"><span class="seg-dot seg-dot-b"></span> Doctor en Crisis</button>
+        <button class="seg-tab" onclick="showSeg('dia-1','c',this)"><span class="seg-dot seg-dot-c"></span> Doctor Estratega</button>
+    </div>
+    <div class="format-toggle" id="fmt-1">
+        <button class="fmt-btn active" onclick="switchFormat('dia-1','post',this)">Post Facebook</button>
+        <button class="fmt-btn" onclick="switchFormat('dia-1','reel',this)">Reel / Video</button>
+    </div>
+    <!-- VAR A -->
+    <div id="dia-1-a" class="seg-content">
+        <div class="format-post">
+        <div class="cuando-usar type-a"><span class="cuando-icon">&#9432;</span> <div><strong>Cuando usar:</strong> Cuando tu audiencia es medica con mentalidad empresarial y competitiva. Ideal para especialistas en zonas urbanas con alta competencia (Bogota, Medellin, Cali).</div></div>
+        <div class="section-block"><div class="section-head"><h3>&#128203; Copy para Facebook</h3><button class="copy-btn" onclick="copySibling(this)">Copiar Copy</button></div><div class="section-body"><div class="copy-display" data-copy>&#127758; ¿Sabes exactamente cuantos consultorios compiten contigo en un radio de 5 km?
+
+La mayoria de medicos opera a ciegas. Atiende pacientes, cobra lo que "cree que esta bien" y espera que el negocio funcione.
+
+Los medicos que lideran su mercado hacen algo diferente: <strong>saben exactamente donde estan parados.</strong>
+
+Con el <strong>TrustMap de TrustMed</strong> puedes visualizar en tiempo real:
+&#128205; Todos los competidores de tu especialidad en tu zona
+&#128176; Sus rangos de precios por procedimiento
+&#128200; Tu posicion real en el mercado (no la que imaginas)
+
+Y con <strong>Pricing Intelligence</strong> descubres si estas cobrando menos de lo que el mercado soporta, o si tus precios te estan alejando pacientes.
+
+Un cardiologo en Bogota descubrio que cobraba 30% menos que el promedio de su zona. En 60 dias ajusto sus tarifas y aumento sus ingresos sin atender un paciente mas.
+
+<strong>Eso no es suerte. Eso es inteligencia competitiva.</strong>
+
+¿Quieres ver tu posicion en el mapa ahora mismo?
+
+&#128073; Activa tu demo gratuita de TrustMed hoy. Link en bio.
+
+#TrustMed #InteligenciaCompetitiva #ConsultorioMedico #GestionMedica #MedicinaDigital #Colombia #Benchmarking #EspecialistasMedicos</div></div></div>
+        <div class="section-block"><div class="section-head"><h3>&#127912; Prompt de Imagen</h3><button class="copy-btn" onclick="copySibling(this)">Copiar Prompt</button></div><div class="section-body"><div class="prompt-display" data-copy>Professional digital dashboard interface displayed on a large screen in a modern Colombian medical office. The screen shows an interactive map of Bogota or Medellin with glowing location pins marking competitor clinics. Color-coded zones (green/yellow/red) indicate price ranges. Clean, corporate medical aesthetic. Dark navy blue UI with gold accent colors. Doctor in white coat standing beside the screen pointing at the map. Photorealistic. Cinematic lighting. 16:9 format.</div></div></div>
+    </div>
+        <div class="format-reel" style="display:none" id="reel-dia-1-a"></div>
+    </div>
+    <!-- VAR B -->
+    <div id="dia-1-b" class="seg-content" style="display:none">
+        <div class="format-post">
+        <div class="cuando-usar type-b"><span class="cuando-icon">&#9432;</span> <div><strong>Cuando usar:</strong> Para medicos que sienten que sus ingresos no reflejan su esfuerzo. Funciona bien con medicos generales, de medicina familiar o especialistas en zonas con alta competencia informal.</div></div>
+        <div class="section-block"><div class="section-head"><h3>&#128203; Copy para Facebook</h3><button class="copy-btn" onclick="copySibling(this)">Copiar Copy</button></div><div class="section-body"><div class="copy-display" data-copy>&#128548; Trabajas 10 horas al dia y al final del mes... el numero no cierra.
+
+¿Alguna vez pensaste que quizas el problema no es cuanto trabajas, sino <strong>cuanto cobras vs lo que el mercado esta pagando?</strong>
+
+Muchos consultorios en Colombia estan dejando plata sobre la mesa sin saberlo. O peor: estan cobrando lo mismo que hace 3 anos mientras sus costos subieron.
+
+TrustMed tiene una herramienta que te dice exactamente esto:
+
+&#128200; <strong>Pricing Intelligence</strong>: Compara tus tarifas actuales contra el promedio real de tu especialidad y tu ciudad.
+&#127758; <strong>TrustMap</strong>: Muestra donde estas ubicado respecto a tu competencia y si hay sobreoferta en tu zona.
+
+El resultado: dejas de adivinar y empiezas a decidir con datos reales.
+
+No se trata de cobrar mas por cobrar. Se trata de cobrar <strong>lo que corresponde.</strong>
+
+Porque si no sabes donde esta el mercado, ¿como sabes si estas ganando o perdiendo?
+
+&#128308; El primer paso para salir de la crisis es entender el terreno.
+
+&#128073; Prueba TrustMed gratis y descubre en minutos como esta posicionado tu consultorio. Link en bio.
+
+#TrustMed #ConsultorioMedico #FinanzasMedicas #MedicosColombia #GestionFinanciera #CrisisFinanciera #PricingMedico</div></div></div>
+        <div class="section-block"><div class="section-head"><h3>&#127912; Prompt de Imagen</h3><button class="copy-btn" onclick="copySibling(this)">Copiar Prompt</button></div><div class="section-body"><div class="prompt-display" data-copy>Split-screen comparison graphic: left side shows a stressed doctor at a messy desk with paper bills and a calculator, dim warm lighting, concerned expression. Right side shows the same doctor calm and confident in front of a clean TrustMed dashboard showing pricing comparison charts and competitor map. Bold color contrast between both sides. Clean sans-serif typography overlay reading "Antes vs Despues". Modern medical office background. Photorealistic. 16:9 format.</div></div></div>
+    </div>
+        <div class="format-reel" style="display:none" id="reel-dia-1-b"></div>
+    </div>
+    <!-- VAR C -->
+    <div id="dia-1-c" class="seg-content" style="display:none">
+        <div class="format-post">
+        <div class="cuando-usar type-c"><span class="cuando-icon">&#9432;</span> <div><strong>Cuando usar:</strong> Para medicos con vision de negocio que ya tienen un consultorio estable y quieren crecer con informacion. Ideal para clinicas pequenas o medicos con segundo consultorio.</div></div>
+        <div class="section-block"><div class="section-head"><h3>&#128203; Copy para Facebook</h3><button class="copy-btn" onclick="copySibling(this)">Copiar Copy</button></div><div class="section-body"><div class="copy-display" data-copy>&#128200; Antes de expandirte, necesitas responder una pregunta clave:
+
+<strong>¿El mercado donde quieres crecer tiene espacio para ti?</strong>
+
+Abrir un segundo consultorio, cambiar de zona o agregar una especialidad sin datos es como conducir con los ojos cerrados. Puede salir bien... o puede costarte anos de trabajo.
+
+Los mejores decisores medicos no adivinan. Analizan.
+
+Con <strong>TrustMap</strong> de TrustMed puedes:
+&#128269; Mapear la densidad de competencia por especialidad en cualquier zona de tu ciudad
+&#128200; Identificar zonas subatendidas con potencial de mercado
+&#128161; Cruzar esa informacion con los precios que el mercado esta pagando en esa area
+
+Y con <strong>Pricing Intelligence</strong> validas si tus tarifas actuales son competitivas o si necesitas ajustarlas antes de expandirte.
+
+Expansion inteligente = datos + estrategia + ejecucion.
+
+TrustMed te da los primeros dos. El tercero es tuyo.
+
+¿Estas pensando en crecer? Empieza por entender el terreno.
+
+&#128073; Activa tu acceso demo hoy y explora el mapa de tu ciudad. Link en bio.
+
+#TrustMed #EstrategiaMedica #ExpansionMedica #InteligenciaCompetitiva #TrustMap #MedicinaDigital #DecisionesDatos #Colombia</div></div></div>
+        <div class="section-block"><div class="section-head"><h3>&#127912; Prompt de Imagen</h3><button class="copy-btn" onclick="copySibling(this)">Copiar Prompt</button></div><div class="section-body"><div class="prompt-display" data-copy>Aerial view of a Colombian city (Bogota or Medellin) overlaid with a transparent digital map interface. Glowing data points mark medical clinics and specialty centers. Green zones highlight underserved areas. A strategic planning board in the foreground shows financial projections and market analysis charts. Sophisticated and data-driven visual tone. Dark teal and gold color palette. Professional medical business aesthetic. 16:9 format.</div></div></div>
+    </div>
+        <div class="format-reel" style="display:none" id="reel-dia-1-c"></div>
+    </div>
+</div>
+
+<!-- ===================== DIA 2 - MARTES ===================== -->
+<div id="dia-2" class="page-section">
+    <div class="page-header">
+        <div class="breadcrumb">Contenido Semanal &gt; Martes</div>
+        <h2>Martes - Alerta Financiera</h2>
+        <p class="subtitle">Deteccion de problemas financieros y pagadores problematicos. Alto potencial de conversion.</p>
+        <div class="page-header-meta">
+            <span class="pill pill-time">11:00 AM</span>
+            <span class="pill pill-format">Post con Imagen</span>
+        </div>
+    </div>
+    <div class="seg-tabs">
+        <button class="seg-tab active-a" onclick="showSeg('dia-2','a',this)"><span class="seg-dot seg-dot-a"></span> Doctor Competitivo</button>
+        <button class="seg-tab" onclick="showSeg('dia-2','b',this)"><span class="seg-dot seg-dot-b"></span> Doctor en Crisis</button>
+        <button class="seg-tab" onclick="showSeg('dia-2','c',this)"><span class="seg-dot seg-dot-c"></span> Doctor Estratega</button>
+    </div>
+    <div class="format-toggle" id="fmt-2">
+        <button class="fmt-btn active" onclick="switchFormat('dia-2','post',this)">Post Facebook</button>
+        <button class="fmt-btn" onclick="switchFormat('dia-2','reel',this)">Reel / Video</button>
+    </div>
+    <div id="dia-2-a" class="seg-content">
+        <div class="format-post">
+        <div class="cuando-usar type-a"><span class="cuando-icon">&#9432;</span> <div><strong>Cuando usar:</strong> Para medicos competitivos que no se habian planteado que sus pagadores pueden ser parte del problema. Los engancha desde el angulo de "eficiencia" y no de "crisis".</div></div>
+        <div class="section-block"><div class="section-head"><h3>&#128203; Copy para Facebook</h3><button class="copy-btn" onclick="copySibling(this)">Copiar Copy</button></div><div class="section-body"><div class="copy-display" data-copy>&#129656; En tu consultorio hay pagadores que te estan <strong>drenando sin que lo notes.</strong>
+
+No es un problema de cuantos pacientes atiendes. Es un problema de <strong>a quien le estas prestando el servicio.</strong>
+
+TrustMed llama a esto el <strong>"Pagador Vampiro"</strong>: ese convenio, esa EPS o esa prepagada que paga tarde, genera glosas, devuelve facturas o simplemente no vale la pena financieramente.
+
+Con el <strong>Analizador de Pagadores</strong> de TrustMed obtienes:
+&#128200; Score de Pagador (0-100): Quien paga bien, quien paga mal, quien no debe estar en tu portafolio.
+&#9201; Tiempo promedio de pago por EPS o prepagada
+&#128184; Rentabilidad real por convenio (no solo facturacion, sino lo que realmente entra)
+
+Un medico competitivo no solo mira cuanto factura. Mira <strong>cuanto recupera</strong> y de quien.
+
+Si tienes 5 convenios pero 2 de ellos generan el 80% de tus dolores de cabeza y solo el 15% de tus ingresos reales... ya sabes que decision tomar.
+
+<strong>Optimiza tu portafolio de pagadores. Trabaja mas inteligente, no mas duro.</strong>
+
+&#128073; Descubre quien te esta drenando. Activa tu demo gratuita. Link en bio.
+
+#TrustMed #PagadorVampiro #FinanzasMedicas #EPS #GestionMedica #ConsultorioInteligente #Colombia #MedicinaDeNegocios</div></div></div>
+        <div class="section-block"><div class="section-head"><h3>&#127912; Prompt de Imagen</h3><button class="copy-btn" onclick="copySibling(this)">Copiar Prompt</button></div><div class="section-body"><div class="prompt-display" data-copy>Modern medical financial dashboard on a tablet screen showing a "Payer Score" interface with a 0-100 rating system. Color-coded list of EPS and insurance companies (green for good payers, red for problematic ones). A glowing red vampire icon subtly integrated next to low-scoring payers. Clean, professional UI design in dark blue and white. Medical professional's hands visible holding the tablet. Crisp studio lighting. 16:9 format.</div></div></div>
+    </div>
+        <div class="format-reel" style="display:none" id="reel-dia-2-a"></div>
+    </div>
+    <div id="dia-2-b" class="seg-content" style="display:none">
+        <div class="format-post">
+        <div class="cuando-usar type-b"><span class="cuando-icon">&#9432;</span> <div><strong>Cuando usar:</strong> Copy de alto impacto emocional para medicos que estan viviendo el dolor de las cuentas por cobrar. El mas directo y urgente de los tres. Ideal para remarketing.</div></div>
+        <div class="section-block"><div class="section-head"><h3>&#128203; Copy para Facebook</h3><button class="copy-btn" onclick="copySibling(this)">Copiar Copy</button></div><div class="section-body"><div class="copy-display" data-copy>&#128680; ¿Cuanto te deben las EPS en este momento?
+
+Suma ese numero en tu cabeza. Ahora preguntate: ¿cuanto de eso vas a recuperar realmente?
+
+Si la respuesta te genera ansiedad, sigue leyendo.
+
+Miles de medicos en Colombia trabajan al limite no porque no tengan pacientes, sino porque <strong>el dinero que ya ganaron no llega.</strong> Glosas, pagos parciales, facturas devueltas, convenios que pagan a 120 dias.
+
+Eso no es mala suerte. Es un problema de datos.
+
+TrustMed detecta exactamente esto:
+
+&#128308; <strong>Pagador Vampiro</strong>: Identifica que EPS o convenio te esta generando perdidas reales.
+&#128200; <strong>Score de Pagador</strong>: Cada pagador tiene una calificacion basada en su comportamiento historico.
+&#128176; <strong>Flujo de Caja en tiempo real</strong>: Sabes exactamente cuanto dinero tienes, cuanto te deben y cuanto llega.
+
+Con esa informacion puedes tomar decisiones que antes no podias: renegociar convenios, eliminar los que no sirven, priorizar los que si pagan.
+
+<strong>Trabajar mas no es la solucion. Trabajar con los pagadores correctos, si lo es.</strong>
+
+&#128073; Activa TrustMed gratis y descubre quien te esta robando el tiempo y la plata. Link en bio.
+
+#TrustMed #EPSColombia #PagadorVampiro #MedicosEnCrisis #FinanzasMedicas #FlujoDeCaja #ConsultorioMedico #Colombia</div></div></div>
+        <div class="section-block"><div class="section-head"><h3>&#127912; Prompt de Imagen</h3><button class="copy-btn" onclick="copySibling(this)">Copiar Prompt</button></div><div class="section-body"><div class="prompt-display" data-copy>Dramatic, high-contrast image of a Colombian doctor sitting at a consultation desk at night, surrounded by stacked paper invoices and medical bills. Stress is visible on their face. On the desk, a phone displays a TrustMed alert notification with a red warning icon showing overdue EPS payments. Moody, dim office lighting contrasted with the bright phone screen. Emotional and relatable. Photorealistic. 16:9 format.</div></div></div>
+    </div>
+        <div class="format-reel" style="display:none" id="reel-dia-2-b"></div>
+    </div>
+    <div id="dia-2-c" class="seg-content" style="display:none">
+        <div class="format-post">
+        <div class="cuando-usar type-c"><span class="cuando-icon">&#9432;</span> <div><strong>Cuando usar:</strong> Para medicos estrategas que ya entienden las metricas pero quieren granularidad en el analisis de su portafolio de pagadores. Tono analitico, no alarmista.</div></div>
+        <div class="section-block"><div class="section-head"><h3>&#128203; Copy para Facebook</h3><button class="copy-btn" onclick="copySibling(this)">Copiar Copy</button></div><div class="section-body"><div class="copy-display" data-copy>&#128200; Tu mix de pagadores define tu rentabilidad. ¿Lo tienes analizado?
+
+Un consultorio que atiende 200 consultas al mes puede ser altamente rentable o estar en deficit dependiendo de una sola variable: <strong>de quien vienen esos pacientes y como paga cada uno.</strong>
+
+TrustMed te entrega el analisis que los contadores tradicionales no pueden darte:
+
+&#128200; <strong>Score de Pagador (0-100)</strong>: Comportamiento financiero historico de cada EPS, prepagada o paciente particular.
+&#128161; <strong>Analisis de rentabilidad por convenio</strong>: No solo cuanto facturaste, sino cuanto recuperaste descontando glosas, descuentos y tiempos de pago.
+&#9888; <strong>Deteccion de Pagador Vampiro</strong>: Alertas automaticas cuando un pagador empieza a deteriorar tu flujo.
+
+Con estos datos puedes:
+&#9989; Priorizar convenios con mayor retorno real
+&#9989; Renegociar condiciones con pagadores estrategicos
+&#9989; Tomar la decision de salir de convenios que no son rentables
+
+<strong>Un portafolio de pagadores optimizado puede ser la diferencia entre crecer y estancarse.</strong>
+
+¿Cuantos de tus convenios actuales superarian una auditoria de rentabilidad real?
+
+&#128073; Analiza tu portafolio con TrustMed. Demo gratuita disponible hoy. Link en bio.
+
+#TrustMed #AnalisisDePagadores #RentabilidadMedica #EPS #GestionEstrategica #FinanzasMedicas #ConsultorioInteligente #MedicinaDigital</div></div></div>
+        <div class="section-block"><div class="section-head"><h3>&#127912; Prompt de Imagen</h3><button class="copy-btn" onclick="copySibling(this)">Copiar Prompt</button></div><div class="section-body"><div class="prompt-display" data-copy>Clean, corporate-style financial analysis dashboard displayed on a large monitor in a modern medical office. The screen shows a detailed payer portfolio breakdown with bar charts, pie charts showing revenue per payer, and a scoring matrix. Color-coded rows highlight top performers in green and underperforming payers in red. Minimalist design with data visualization focus. A doctor in business casual attire reviews the data thoughtfully. Professional office lighting. 16:9 format.</div></div></div>
+    </div>
+        <div class="format-reel" style="display:none" id="reel-dia-2-c"></div>
+    </div>
+</div>
+
+<!-- ===================== DIA 3 - MIERCOLES ===================== -->
+<div id="dia-3" class="page-section">
+    <div class="page-header">
+        <div class="breadcrumb">Contenido Semanal &gt; Miercoles</div>
+        <h2>Miercoles - Caso de Exito</h2>
+        <p class="subtitle">Historia de transformacion con datos. Prueba social poderosa para cada segmento.</p>
+        <div class="page-header-meta">
+            <span class="pill pill-time">10:00 AM</span>
+            <span class="pill pill-format">Post Narrativo</span>
+        </div>
+    </div>
+    <div class="seg-tabs">
+        <button class="seg-tab active-a" onclick="showSeg('dia-3','a',this)"><span class="seg-dot seg-dot-a"></span> Doctor Competitivo</button>
+        <button class="seg-tab" onclick="showSeg('dia-3','b',this)"><span class="seg-dot seg-dot-b"></span> Doctor en Crisis</button>
+        <button class="seg-tab" onclick="showSeg('dia-3','c',this)"><span class="seg-dot seg-dot-c"></span> Doctor Estratega</button>
+    </div>
+    <div class="format-toggle" id="fmt-3">
+        <button class="fmt-btn active" onclick="switchFormat('dia-3','post',this)">Post Facebook</button>
+        <button class="fmt-btn" onclick="switchFormat('dia-3','reel',this)">Reel / Video</button>
+    </div>
+    <div id="dia-3-a" class="seg-content">
+        <div class="format-post">
+        <div class="cuando-usar type-a"><span class="cuando-icon">&#9432;</span> <div><strong>Cuando usar:</strong> Prueba social dirigida a medicos que dudan si la inteligencia competitiva realmente impacta sus ingresos. El caso concreto destruye la objecion "no creo que funcione para mi".</div></div>
+        <div class="section-block"><div class="section-head"><h3>&#128203; Copy para Facebook</h3><button class="copy-btn" onclick="copySibling(this)">Copiar Copy</button></div><div class="section-body"><div class="copy-display" data-copy>&#128161; Como un dermatologo en Medellin descubrio que estaba regalando sus servicios.
+
+Carlos lleva 8 anos ejerciendo dermatologia estetica. Exitoso, con agenda llena, referencias constantes.
+
+Pero tenia una duda que no lo dejaba dormir: <strong>¿Estoy cobrando bien?</strong>
+
+Cuando activo TrustMed y uso el <strong>Pricing Intelligence</strong>, lo que encontro lo dejo sin palabras:
+
+&#128269; El 60% de sus procedimientos mas demandados estaban por debajo del promedio de su zona.
+&#127758; En su radio de 3 km habia 4 competidores directos, 2 de los cuales cobraban hasta 40% mas por servicios similares.
+
+No porque fueran mejores. Sino porque tenian datos y el no.
+
+En 45 dias ajusto sus tarifas de forma estrategica: no subiendolas todas de golpe, sino priorizando los procedimientos con mayor demanda y margen.
+
+<strong>Resultado: +28% en ingresos. Sin un paciente nuevo. Sin ampliar su agenda.</strong>
+
+Solo ajustando lo que ya estaba cobrando mal.
+
+Eso es lo que hace la inteligencia competitiva real. No te dice que hagas. Te muestra exactamente <strong>donde estas dejando plata sobre la mesa.</strong>
+
+¿Quieres ver donde esta la tuya?
+
+&#128073; Activa tu demo de TrustMed hoy. Link en bio.
+
+#TrustMed #CasoDeExito #Dermatologia #PricingIntelligence #MedicinaEstetica #Colombia #Medellin #IngresosMedicos</div></div></div>
+        <div class="section-block"><div class="section-head"><h3>&#127912; Prompt de Imagen</h3><button class="copy-btn" onclick="copySibling(this)">Copiar Prompt</button></div><div class="section-body"><div class="prompt-display" data-copy>Success story visual: A confident Latin American dermatologist in a modern, well-lit aesthetic clinic. Split visual showing a before/after revenue comparison chart on a tablet. The chart shows a clear upward trend with a 28% increase marker. Clean, aspirational medical office setting with elegant decor. Soft warm lighting. Photorealistic. The doctor is smiling and professional. Data visualization elements overlaid subtly. 16:9 format.</div></div></div>
+    </div>
+        <div class="format-reel" style="display:none" id="reel-dia-3-a"></div>
+    </div>
+    <div id="dia-3-b" class="seg-content" style="display:none">
+        <div class="format-post">
+        <div class="cuando-usar type-b"><span class="cuando-icon">&#9432;</span> <div><strong>Cuando usar:</strong> Historia de rescate financiero. Para medicos que sienten que ya es tarde o que su situacion es irreversible. El mensaje central: "hay salida y empieza con datos".</div></div>
+        <div class="section-block"><div class="section-head"><h3>&#128203; Copy para Facebook</h3><button class="copy-btn" onclick="copySibling(this)">Copiar Copy</button></div><div class="section-body"><div class="copy-display" data-copy>&#128552; Hace 6 meses, Maria estaba a punto de cerrar su consultorio.
+
+Pediatra con 12 anos de experiencia. Pacientes fieles. Pero los numeros no cerraban.
+
+Le debia al arrendador. Le debia al banco. Y seguia sin entender <strong>por que.</strong>
+
+Tenia pacientes. Tenia convenios. Tenia agenda llena.
+
+Cuando activo TrustMed, el diagnostico fue brutal y revelador:
+
+&#10060; 3 de sus 5 convenios con EPS tenian un <strong>Score de Pagador por debajo de 40/100.</strong>
+&#10060; Uno de esos convenios representaba el 35% de su facturacion pero solo el 12% de lo que realmente entraba.
+&#10060; Su flujo de caja mostraba un deficit estructural que se repetia cada mes desde hace un ano.
+
+Con ese diagnostico claro, Maria tomo decisiones que antes no podia tomar porque no tenia la informacion:
+
+&#9989; Salio de 2 convenios que la estaban hundiendo.
+&#9989; Negocio condiciones con el tercero.
+&#9989; Aumento su porcion de pacientes particulares en un 40%.
+
+En 90 dias su consultorio estaba en azul.
+
+<strong>El problema nunca fue cuanto trabajaba. Era con quien trabajaba.</strong>
+
+¿Cuantos meses mas vas a operar sin estos datos?
+
+&#128073; Activa TrustMed gratis. El diagnostico tarda minutos. Link en bio.
+
+#TrustMed #TransformacionFinanciera #MedicosEnCrisis #Pediatria #EPS #FlujoDeCaja #ConsultorioMedico #Colombia</div></div></div>
+        <div class="section-block"><div class="section-head"><h3>&#127912; Prompt de Imagen</h3><button class="copy-btn" onclick="copySibling(this)">Copiar Prompt</button></div><div class="section-body"><div class="prompt-display" data-copy>Emotional transformation story visual. Two-panel image: Left panel shows a worried female Latin American doctor at a cluttered desk with unpaid bills and a worried expression, dim lighting. Right panel shows the same doctor 90 days later, confident, in a clean organized office, reviewing positive financial charts on a laptop with a smile. Warm, hopeful lighting on the right panel. Text overlay: "90 dias despues." Photorealistic style. 16:9 format.</div></div></div>
+    </div>
+        <div class="format-reel" style="display:none" id="reel-dia-3-b"></div>
+    </div>
+    <div id="dia-3-c" class="seg-content" style="display:none">
+        <div class="format-post">
+        <div class="cuando-usar type-c"><span class="cuando-icon">&#9432;</span> <div><strong>Cuando usar:</strong> Para medicos que quieren escalar y buscan validacion de que la plataforma soporta decisiones de expansion real. El caso debe demostrar capacidad analitica avanzada.</div></div>
+        <div class="section-block"><div class="section-head"><h3>&#128203; Copy para Facebook</h3><button class="copy-btn" onclick="copySibling(this)">Copiar Copy</button></div><div class="section-body"><div class="copy-display" data-copy>&#128200; Como un ortopedista decidio abrir su segunda sede usando datos, no instinto.
+
+Juan Pablo lleva 6 anos con su consultorio de ortopedia en Cali. Siempre quiso expandirse, pero siempre lo freno la misma pregunta:
+
+<strong>¿Y si me equivoco de zona?</strong>
+
+Antes de activar TrustMed, esa decision dependia de intuicion, conversaciones con colegas y "lo que se ve en la calle".
+
+Despues de activarlo, el proceso cambio completamente:
+
+&#127758; Con <strong>TrustMap</strong> identifico dos zonas en Cali con alta demanda de ortopedia y baja densidad de especialistas.
+&#128200; Con <strong>Pricing Intelligence</strong> valido que el mercado en esas zonas soportaba sus tarifas o incluso tarifas mas altas.
+&#128302; Con el <strong>Simulador de Escenarios</strong> proyecto 3 modelos financieros distintos: expansion conservadora, moderada y agresiva.
+
+No abrio la sede donde "creia" que debia abrirla. La abrio donde los datos decian que debia abrirla.
+
+<strong>Resultado: En el primer trimestre, la nueva sede alcanzo el 70% del volumen de la sede principal.</strong>
+
+Eso no es suerte. Es decision basada en datos.
+
+¿Tu proxima decision de expansion va a ser igual de informada?
+
+&#128073; Explora TrustMed hoy. Demo gratuita disponible. Link en bio.
+
+#TrustMed #ExpansionMedica #Ortopedia #SimuladorDeEscenarios #TrustMap #DecisionesDatos #Cali #Colombia #EstrategiaMedica</div></div></div>
+        <div class="section-block"><div class="section-head"><h3>&#127912; Prompt de Imagen</h3><button class="copy-btn" onclick="copySibling(this)">Copiar Prompt</button></div><div class="section-body"><div class="prompt-display" data-copy>Strategic business story visual: A confident Latin American orthopedic surgeon reviewing an expansion plan in a modern office. Two screens visible - one showing TrustMap with Cali city map and data points, another showing financial scenario simulation charts. Documents on desk show floor plans and financial projections. Professional, successful business atmosphere. Neutral tones with blue accent lighting. Photorealistic. 16:9 format.</div></div></div>
+    </div>
+        <div class="format-reel" style="display:none" id="reel-dia-3-c"></div>
+    </div>
+</div>
+
+<!-- ===================== DIA 4 - JUEVES ===================== -->
+<div id="dia-4" class="page-section">
+    <div class="page-header">
+        <div class="breadcrumb">Contenido Semanal &gt; Jueves</div>
+        <h2>Jueves - Tip Estrategico</h2>
+        <p class="subtitle">Consejo practico de alto valor. Ideal para captar leads educados.</p>
+        <div class="page-header-meta">
+            <span class="pill pill-time">12:00 PM</span>
+            <span class="pill pill-format">Post Educativo</span>
+        </div>
+    </div>
+    <div class="seg-tabs">
+        <button class="seg-tab active-a" onclick="showSeg('dia-4','a',this)"><span class="seg-dot seg-dot-a"></span> Doctor Competitivo</button>
+        <button class="seg-tab" onclick="showSeg('dia-4','b',this)"><span class="seg-dot seg-dot-b"></span> Doctor en Crisis</button>
+        <button class="seg-tab" onclick="showSeg('dia-4','c',this)"><span class="seg-dot seg-dot-c"></span> Doctor Estratega</button>
+    </div>
+    <div class="format-toggle" id="fmt-4">
+        <button class="fmt-btn active" onclick="switchFormat('dia-4','post',this)">Post Facebook</button>
+        <button class="fmt-btn" onclick="switchFormat('dia-4','reel',this)">Reel / Video</button>
+    </div>
+    <div id="dia-4-a" class="seg-content">
+        <div class="format-post">
+        <div class="cuando-usar type-a"><span class="cuando-icon">&#9432;</span> <div><strong>Cuando usar:</strong> Contenido educativo de alto valor para medicos que consumen contenido de negocio y marketing. Posiciona a TrustMed como autoridad en inteligencia competitiva medica.</div></div>
+        <div class="section-block"><div class="section-head"><h3>&#128203; Copy para Facebook</h3><button class="copy-btn" onclick="copySibling(this)">Copiar Copy</button></div><div class="section-body"><div class="copy-display" data-copy>&#127919; 5 datos que todo medico competitivo deberia conocer sobre su mercado (y probablemente no conoce).
+
+Si lideras o quieres liderar tu especialidad en tu zona, necesitas responder estas 5 preguntas hoy:
+
+<strong>1. ¿Cuantos competidores directos tienes en un radio de 3 km?</strong>
+No el estimado. El numero exacto.
+
+<strong>2. ¿Cual es el precio promedio de tu procedimiento estrella en tu ciudad?</strong>
+No lo que te dijeron. El dato real del mercado.
+
+<strong>3. ¿Estas por encima, en el promedio o por debajo?</strong>
+Y si estas por debajo, ¿por estrategia o por desconocimiento?
+
+<strong>4. ¿Hay zonas en tu ciudad con alta demanda de tu especialidad y poca oferta?</strong>
+Eso se llama oportunidad. ¿La ves?
+
+<strong>5. ¿Que tan rapido esta cambiando el mercado en tu zona?</strong>
+Los precios del sector medico se mueven. ¿Cada cuanto actualizas tus tarifas?
+
+Con <strong>TrustMap</strong> y <strong>Pricing Intelligence</strong> de TrustMed, estas 5 preguntas tienen respuesta en tiempo real.
+
+<strong>El medico que tiene informacion tiene ventaja. El que no, trabaja para el que si la tiene.</strong>
+
+&#128073; Activa tu acceso a TrustMed y responde estas preguntas hoy. Link en bio.
+
+#TrustMed #TipEstrategico #InteligenciaCompetitiva #MedicinaDeNegocios #Benchmarking #PricingMedico #ConsultorioInteligente</div></div></div>
+        <div class="section-block"><div class="section-head"><h3>&#127912; Prompt de Imagen</h3><button class="copy-btn" onclick="copySibling(this)">Copiar Prompt</button></div><div class="section-body"><div class="prompt-display" data-copy>Clean, educational-style infographic design. Bold numbered list layout (1-5) with icons representing each question: map pin, price tag, bar chart, location marker, trend arrow. Modern medical business aesthetic with navy blue and white colors. TrustMed branding subtly visible. Clean sans-serif typography. Professional and shareable format. 16:9 format.</div></div></div>
+    </div>
+        <div class="format-reel" style="display:none" id="reel-dia-4-a"></div>
+    </div>
+    <div id="dia-4-b" class="seg-content" style="display:none">
+        <div class="format-post">
+        <div class="cuando-usar type-b"><span class="cuando-icon">&#9432;</span> <div><strong>Cuando usar:</strong> Tip practico de supervivencia financiera. Para medicos que necesitan acciones concretas e inmediatas, no teoria. Copy mas corto y directo.</div></div>
+        <div class="section-block"><div class="section-head"><h3>&#128203; Copy para Facebook</h3><button class="copy-btn" onclick="copySibling(this)">Copiar Copy</button></div><div class="section-body"><div class="copy-display" data-copy>&#128680; Si tu consultorio tiene flujo de caja negativo, esto es lo primero que debes revisar.
+
+No el marketing. No los gastos de papeleria. No el numero de pacientes.
+
+Lo primero que debes revisar es esto:
+
+<strong>1. ¿Quien te debe mas plata en este momento?</strong>
+Hazlo ahora. Suma las cuentas por cobrar por cada EPS o convenio.
+
+<strong>2. ¿Cuanto tiempo lleva sin pagarte cada uno?</strong>
+Si llevan mas de 60 dias, eso no es "por cobrar". Es una perdida probable.
+
+<strong>3. ¿Cual es tu Score de cada pagador?</strong>
+¿Tienen historial de pago confiable o son reincidentes?
+
+El <strong>modulo de Caja y el Analizador de Pagadores de TrustMed</strong> hace este analisis automaticamente. En minutos sabes exactamente donde se esta yendo tu dinero y quien te lo debe.
+
+La mayoria de consultorios en crisis no tienen mas gastos que los rentables. Tienen peores pagadores.
+
+<strong>No trabajes mas. Trabaja con los pagadores correctos.</strong>
+
+El primer paso es tener los datos. Despues vienen las decisiones.
+
+&#128073; Activa TrustMed gratis. El diagnostico lo tienes en tu primer dia. Link en bio.
+
+#TrustMed #FlujoDeCaja #PagadorVampiro #MedicosEnCrisis #FinanzasMedicas #EPS #ConsultorioMedico #TipMedico</div></div></div>
+        <div class="section-block"><div class="section-head"><h3>&#127912; Prompt de Imagen</h3><button class="copy-btn" onclick="copySibling(this)">Copiar Prompt</button></div><div class="section-body"><div class="prompt-display" data-copy>Urgent, action-oriented visual: Close-up of a doctor's hands at a desk, one hand holding a pen over a notebook, the other pointing at a tablet showing TrustMed's cash flow dashboard with clear red and green indicators. The screen shows an accounts receivable summary with overdue amounts highlighted in red. Focused, problem-solving atmosphere. Warm desk lamp lighting. Slightly dramatic. Photorealistic. 16:9 format.</div></div></div>
+    </div>
+        <div class="format-reel" style="display:none" id="reel-dia-4-b"></div>
+    </div>
+    <div id="dia-4-c" class="seg-content" style="display:none">
+        <div class="format-post">
+        <div class="cuando-usar type-c"><span class="cuando-icon">&#9432;</span> <div><strong>Cuando usar:</strong> Para medicos con vision de largo plazo. El tip debe ser sofisticado y orientado a decision estrategica, no a crisis inmediata.</div></div>
+        <div class="section-block"><div class="section-head"><h3>&#128203; Copy para Facebook</h3><button class="copy-btn" onclick="copySibling(this)">Copiar Copy</button></div><div class="section-body"><div class="copy-display" data-copy>&#128302; Antes de tomar cualquier decision financiera grande en tu consultorio, simula 3 escenarios.
+
+Esta es la diferencia entre un medico que reacciona y uno que anticipa:
+
+El medico reactivo toma decisiones cuando ya paso el problema.
+El medico estratega las toma antes, con modelos de lo que podria pasar.
+
+Aqui el proceso que recomendamos:
+
+<strong>Escenario 1 - Conservador</strong>: ¿Que pasa si mantengo todo igual? ¿Hacia donde va mi rentabilidad en 12 meses?
+
+<strong>Escenario 2 - Moderado</strong>: ¿Que pasa si ajusto mis tarifas un 15% y elimino el convenio menos rentable? ¿Cuanto mejora mi flujo?
+
+<strong>Escenario 3 - Agresivo</strong>: ¿Que pasa si abro una segunda sede o amplio mi equipo? ¿En cuanto tiempo recupero la inversion?
+
+El <strong>Simulador de Escenarios Financieros de TrustMed</strong> hace exactamente esto. No con intuicion. Con tus datos reales de facturacion, costos y comportamiento de pagadores.
+
+<strong>La diferencia entre una decision correcta y una costosa a veces es una simulacion de 10 minutos.</strong>
+
+¿Tu proxima decision grande tiene soporte de datos?
+
+&#128073; Activa TrustMed y empieza a simular hoy. Link en bio.
+
+#TrustMed #SimuladorDeEscenarios #DecisionesDatos #EstrategiaMedica #PlanificacionFinanciera #GestionMedica #MedicinaDigital #Colombia</div></div></div>
+        <div class="section-block"><div class="section-head"><h3>&#127912; Prompt de Imagen</h3><button class="copy-btn" onclick="copySibling(this)">Copiar Prompt</button></div><div class="section-body"><div class="prompt-display" data-copy>Three-panel scenario simulation interface displayed on a wide screen. Each panel shows a different financial outcome (conservative, moderate, aggressive) with clean line charts showing 12-month revenue projections. Color-coded: green for positive, yellow for neutral, red for risk scenarios. A focused doctor reviews the simulations with a thoughtful expression. Modern office setting. Blue and white color scheme. Professional data visualization aesthetic. 16:9 format.</div></div></div>
+    </div>
+        <div class="format-reel" style="display:none" id="reel-dia-4-c"></div>
+    </div>
+</div>
+
+<!-- ===================== DIA 5 - VIERNES ===================== -->
+<div id="dia-5" class="page-section">
+    <div class="page-header">
+        <div class="breadcrumb">Contenido Semanal &gt; Viernes</div>
+        <h2>Viernes - Mito vs Realidad</h2>
+        <p class="subtitle">Desmitificar creencias sobre finanzas medicas. Formato comparativo de alto engagement.</p>
+        <div class="page-header-meta">
+            <span class="pill pill-time">1:00 PM</span>
+            <span class="pill pill-format">Post Comparativo</span>
+        </div>
+    </div>
+    <div class="seg-tabs">
+        <button class="seg-tab active-a" onclick="showSeg('dia-5','a',this)"><span class="seg-dot seg-dot-a"></span> Doctor Competitivo</button>
+        <button class="seg-tab" onclick="showSeg('dia-5','b',this)"><span class="seg-dot seg-dot-b"></span> Doctor en Crisis</button>
+        <button class="seg-tab" onclick="showSeg('dia-5','c',this)"><span class="seg-dot seg-dot-c"></span> Doctor Estratega</button>
+    </div>
+    <div class="format-toggle" id="fmt-5">
+        <button class="fmt-btn active" onclick="switchFormat('dia-5','post',this)">Post Facebook</button>
+        <button class="fmt-btn" onclick="switchFormat('dia-5','reel',this)">Reel / Video</button>
+    </div>
+    <div id="dia-5-a" class="seg-content">
+        <div class="format-post">
+        <div class="cuando-usar type-a"><span class="cuando-icon">&#9432;</span> <div><strong>Cuando usar:</strong> Para derribar la creencia de que "ya se como esta el mercado" sin datos reales. Funciona bien para medicos establecidos que subestiman la inteligencia competitiva.</div></div>
+        <div class="section-block"><div class="section-head"><h3>&#128203; Copy para Facebook</h3><button class="copy-btn" onclick="copySibling(this)">Copiar Copy</button></div><div class="section-body"><div class="copy-display" data-copy>&#10060; MITO: "Yo ya se cuanto cobran los otros medicos de mi zona."
+&#9989; REALIDAD: Probablemente no lo sabes con precision. Y eso te esta costando dinero.
+
+Cuando preguntamos a medicos sobre los precios de sus competidores, la mayoria responde con confianza. Pero cuando comparamos esas percepciones contra los datos reales de mercado, la diferencia es alarmante.
+
+<strong>Lo que los medicos creen saber:</strong>
+- "Mas o menos cobran parecido a mi"
+- "Creo que estoy un poco mas barato para atraer pacientes"
+- "Un colega me comento que el cobra X"
+
+<strong>Lo que los datos reales muestran:</strong>
+&#128200; El 62% de los medicos que usan Pricing Intelligence descubren que estan fuera del rango optimo de mercado.
+&#128176; El medico promedio deja entre 15% y 35% de ingresos adicionales sobre la mesa por falta de informacion de precios.
+&#127758; Los competidores mas cercanos raras veces tienen las tarifas que uno cree.
+
+La informacion de boca en boca no es inteligencia competitiva. Es ruido.
+
+<strong>TrustMed te da datos reales, actualizados y geolocalizados para tu especialidad y tu zona.</strong>
+
+Deja de adivinar. Empieza a saber.
+
+&#128073; Activa tu demo y ve los numeros reales de tu mercado. Link en bio.
+
+#TrustMed #MitoVsRealidad #Benchmarking #PricingIntelligence #MedicinaDeNegocios #ConsultorioMedico #Colombia #InteligenciaCompetitiva</div></div></div>
+        <div class="section-block"><div class="section-head"><h3>&#127912; Prompt de Imagen</h3><button class="copy-btn" onclick="copySibling(this)">Copiar Prompt</button></div><div class="section-body"><div class="prompt-display" data-copy>Bold, graphic myth-busting visual. Clean split design with "MITO" in large red text on the left (showing a blurry, uncertain illustration of a doctor guessing prices) and "REALIDAD" in green on the right (showing a clear, sharp TrustMed dashboard with precise pricing data). Striking visual contrast. Modern infographic style with medical and business design elements. Clean white background with strong typography. 16:9 format.</div></div></div>
+    </div>
+        <div class="format-reel" style="display:none" id="reel-dia-5-a"></div>
+    </div>
+    <div id="dia-5-b" class="seg-content" style="display:none">
+        <div class="format-post">
+        <div class="cuando-usar type-b"><span class="cuando-icon">&#9432;</span> <div><strong>Cuando usar:</strong> Para destruir la creencia mas peligrosa de los medicos en crisis: que el problema es de volumen de pacientes. El mito que mas retrasa la solucion.</div></div>
+        <div class="section-block"><div class="section-head"><h3>&#128203; Copy para Facebook</h3><button class="copy-btn" onclick="copySibling(this)">Copiar Copy</button></div><div class="section-body"><div class="copy-display" data-copy>&#10060; MITO: "Si tuviera mas pacientes, mis problemas financieros se resolveran."
+&#9989; REALIDAD: Mas pacientes con los pagadores equivocados = mas deuda, mas trabajo, mismo resultado.
+
+Este es el error mas comun y mas costoso que cometen los consultorios en dificultades financieras.
+
+Creen que la solucion es volumen. Mas citas. Mas convenios. Mas pacientes.
+
+Pero si el problema es estructural, escalar solo escala el problema.
+
+<strong>Lo que realmente pasa:</strong>
+Un consultorio con 200 consultas mensuales puede tener menos flujo de caja que uno con 100 consultas, si el segundo tiene mejores pagadores.
+
+&#128308; Atender 50 pacientes de una EPS que paga a 120 dias genera facturacion en papel y deficit en la cuenta.
+&#128994; Atender 30 pacientes particulares con pago inmediato puede ser mas rentable que los 50 anteriores.
+
+TrustMed te muestra esto en numeros reales:
+&#9989; Rentabilidad por tipo de paciente
+&#9989; Tiempo promedio de recuperacion por pagador
+&#9989; Score de cada convenio que tienes activo
+
+<strong>El problema no siempre es cuantos pacientes tienes. Es cuales tienes.</strong>
+
+&#128073; Descubre la estructura real de tu consultorio. Activa TrustMed gratis. Link en bio.
+
+#TrustMed #MitoVsRealidad #MedicosEnCrisis #FlujoDeCaja #RentabilidadMedica #EPS #ConsultorioMedico #Colombia</div></div></div>
+        <div class="section-block"><div class="section-head"><h3>&#127912; Prompt de Imagen</h3><button class="copy-btn" onclick="copySibling(this)">Copiar Prompt</button></div><div class="section-body"><div class="prompt-display" data-copy>Conceptual myth-busting visual: Two identical doctors (same tired expression, same white coat). Left doctor has a HUGE pile of patient files and folders but an empty wallet visible in pocket. Right doctor has fewer files but a clear, positive balance shown on a phone screen. Bold "MAS PACIENTES ≠ MAS DINERO" text overlay. Clean, modern design. Medical office background. Striking contrast in body language. 16:9 format.</div></div></div>
+    </div>
+        <div class="format-reel" style="display:none" id="reel-dia-5-b"></div>
+    </div>
+    <div id="dia-5-c" class="seg-content" style="display:none">
+        <div class="format-post">
+        <div class="cuando-usar type-c"><span class="cuando-icon">&#9432;</span> <div><strong>Cuando usar:</strong> Dirigido a medicos que subestiman el impacto de la tecnologia en la gestion financiera medica. Destruye la creencia de que "con Excel o el contador es suficiente".</div></div>
+        <div class="section-block"><div class="section-head"><h3>&#128203; Copy para Facebook</h3><button class="copy-btn" onclick="copySibling(this)">Copiar Copy</button></div><div class="section-body"><div class="copy-display" data-copy>&#10060; MITO: "Con mi contador y una hoja de Excel tengo todo lo que necesito para gestionar mi consultorio."
+&#9989; REALIDAD: Tienes los datos del pasado. Te faltan los datos del presente y la proyeccion del futuro.
+
+Un contador es fundamental. Excel es util. Pero ninguno de los dos te dice:
+
+&#128200; Que tan competitivos son tus precios vs el mercado HOY
+&#127758; Cuantos competidores nuevos han abierto cerca de ti en los ultimos 3 meses
+&#128200; Si tu mix de pagadores esta mejorando o deteriorando tu rentabilidad
+&#128302; Cual de los 3 escenarios de expansion que consideras es financieramente viable
+
+El contador te dice cuanto ganaste. TrustMed te dice cuanto podrias ganar y como.
+
+La diferencia no es operativa. Es estrategica.
+
+Los medicos que lideran su mercado en los proximos 5 anos no seran los que trabajen mas horas. Seran los que tomen mejores decisiones.
+
+Y las mejores decisiones requieren la mejor informacion.
+
+<strong>TrustMed no reemplaza a tu contador. Lo potencia. Y te da lo que el no puede darte: inteligencia de mercado en tiempo real.</strong>
+
+¿Tu herramienta actual puede hacer eso?
+
+&#128073; Compruebalo gratis. Demo disponible hoy. Link en bio.
+
+#TrustMed #MitoVsRealidad #GestionMedica #FinanzasMedicas #MedicinaDigital #EstrategiaMedica #SaaS #Colombia #TecnologiaMedica</div></div></div>
+        <div class="section-block"><div class="section-head"><h3>&#127912; Prompt de Imagen</h3><button class="copy-btn" onclick="copySibling(this)">Copiar Prompt</button></div><div class="section-body"><div class="prompt-display" data-copy>Sharp contrast comparison graphic. Left side shows a traditional setup: calculator, paper spreadsheets, accounting ledger books, old computer. Right side shows TrustMed's modern dashboard on a sleek laptop with real-time charts, competitor maps, and financial projections. Bold dividing line in the center. Typography overlay: "Antes vs Ahora". Clean, modern aesthetic. Professional medical/business crossover design. 16:9 format.</div></div></div>
+    </div>
+        <div class="format-reel" style="display:none" id="reel-dia-5-c"></div>
+    </div>
+</div>
+
+<!-- ===================== DIA 6 - SABADO ===================== -->
+<div id="dia-6" class="page-section">
+    <div class="page-header">
+        <div class="breadcrumb">Contenido Semanal &gt; Sabado</div>
+        <h2>Sabado - Herramienta Destacada</h2>
+        <p class="subtitle">Showcase de funcionalidad. Mayor tiempo de lectura del usuario, ideal para demo requests.</p>
+        <div class="page-header-meta">
+            <span class="pill pill-time">10:00 AM</span>
+            <span class="pill pill-format">Post Showcase</span>
+        </div>
+    </div>
+    <div class="seg-tabs">
+        <button class="seg-tab active-a" onclick="showSeg('dia-6','a',this)"><span class="seg-dot seg-dot-a"></span> Doctor Competitivo</button>
+        <button class="seg-tab" onclick="showSeg('dia-6','b',this)"><span class="seg-dot seg-dot-b"></span> Doctor en Crisis</button>
+        <button class="seg-tab" onclick="showSeg('dia-6','c',this)"><span class="seg-dot seg-dot-c"></span> Doctor Estratega</button>
+    </div>
+    <div class="format-toggle" id="fmt-6">
+        <button class="fmt-btn active" onclick="switchFormat('dia-6','post',this)">Post Facebook</button>
+        <button class="fmt-btn" onclick="switchFormat('dia-6','reel',this)">Reel / Video</button>
+    </div>
+    <div id="dia-6-a" class="seg-content">
+        <div class="format-post">
+        <div class="cuando-usar type-a"><span class="cuando-icon">&#9432;</span> <div><strong>Cuando usar:</strong> Showcase de TrustMap + Pricing Intelligence. El sabado es dia de menor competencia y mayor engagement organico. Ideal para posts detallados sobre funcionalidades.</div></div>
+        <div class="section-block"><div class="section-head"><h3>&#128203; Copy para Facebook</h3><button class="copy-btn" onclick="copySibling(this)">Copiar Copy</button></div><div class="section-body"><div class="copy-display" data-copy>&#127758; Herramienta del dia: <strong>TrustMap + Pricing Intelligence</strong>
+
+La combinacion que ninguna plataforma medica en Colombia te ofrecia hasta ahora.
+
+Imagina poder abrir una pantalla y ver:
+
+&#128205; Cada especialista de tu area en un mapa interactivo de tu ciudad
+&#128176; El rango de precios que cobra cada tipo de consultorio por procedimiento
+&#128200; Tu posicion exacta en ese mapa: si estas en zona de alta competencia, baja competencia, precios altos o bajos
+&#127919; Las oportunidades que nadie mas esta viendo porque nadie mas tiene estos datos
+
+<strong>Eso es exactamente lo que hace TrustMap + Pricing Intelligence de TrustMed.</strong>
+
+No es un mapa generico. Es inteligencia competitiva especifica para el sector medico colombiano.
+
+Como se usa:
+1. Seleccionas tu especialidad y tu ciudad
+2. El mapa muestra la densidad competitiva en tiempo real
+3. Pricing Intelligence cruza esa informacion con los precios promedio del mercado
+4. Obtienes un benchmarking completo en menos de 5 minutos
+
+Un cardiologo en Bogota uso esto para identificar que en Chapinero habia demanda insatisfecha de su especialidad y los precios promedio eran 25% mayores que en su zona actual.
+
+Eso se llama ventaja competitiva. ¿La quieres?
+
+&#128073; Activa tu acceso a TrustMed y explora tu mercado hoy. Link en bio.
+
+#TrustMed #TrustMap #PricingIntelligence #HerramientaDelDia #InteligenciaCompetitiva #MedicinaDigital #ConsultorioInteligente #Colombia</div></div></div>
+        <div class="section-block"><div class="section-head"><h3>&#127912; Prompt de Imagen</h3><button class="copy-btn" onclick="copySibling(this)">Copiar Prompt</button></div><div class="section-body"><div class="prompt-display" data-copy>Feature showcase visual: Beautiful, large-screen display of TrustMap interface showing a Bogota or Medellin map with detailed competitor data layers. Color-coded medical specialty clusters, pricing heat maps (cooler colors for lower prices, warm colors for higher prices), and a clean sidebar showing Pricing Intelligence metrics. Modern, high-tech medical SaaS aesthetic. Dark UI with vivid data visualization. Screen filling most of the frame. Cinematic product photography style. 16:9 format.</div></div></div>
+    </div>
+        <div class="format-reel" style="display:none" id="reel-dia-6-a"></div>
+    </div>
+    <div id="dia-6-b" class="seg-content" style="display:none">
+        <div class="format-post">
+        <div class="cuando-usar type-b"><span class="cuando-icon">&#9432;</span> <div><strong>Cuando usar:</strong> Showcase del modulo de Caja y el Analizador de Pagadores. Herramientas de supervivencia financiera inmediata. El sabado la audiencia tiene mas tiempo para leer y procesar.</div></div>
+        <div class="section-block"><div class="section-head"><h3>&#128203; Copy para Facebook</h3><button class="copy-btn" onclick="copySibling(this)">Copiar Copy</button></div><div class="section-body"><div class="copy-display" data-copy>&#128184; Herramienta del dia: <strong>Modulo de Caja + Analizador de Pagadores</strong>
+
+Si tu consultorio tiene problemas de flujo, estas dos herramientas pueden cambiar tu realidad en menos de una semana.
+
+<strong>Modulo de Caja - Lo que hace:</strong>
+&#128200; Muestra en tiempo real cuanto dinero tienes disponible, cuanto esta por entrar y cuanto por salir
+&#9201; Proyecta tu flujo de caja a 30, 60 y 90 dias
+&#128680; Genera alertas cuando detecta un riesgo de deficit antes de que ocurra
+
+<strong>No te enteras del problema cuando ya paso. Te enteras antes.</strong>
+
+<strong>Analizador de Pagadores - Lo que hace:</strong>
+&#128203; Calcula el Score de cada EPS, prepagada o convenio (0-100)
+&#129656; Identifica al "Pagador Vampiro": el que paga tarde, genera glosas o no es rentable
+&#128161; Te dice exactamente cuanto estarias ganando si eliminaras o renegociaras tus peores convenios
+
+<strong>Por que estas dos herramientas juntas cambian todo:</strong>
+
+Porque la mayoria de consultorios en crisis no tienen mas gastos que los rentables. Tienen <strong>peores pagadores y peor visibilidad</strong> de cuando entra y cuando sale el dinero.
+
+Con estas herramientas activas, un medico en Bogota detecto que un solo convenio le generaba el 40% de sus problemas de flujo. Lo renegocio. En 45 dias estaba en equilibrio.
+
+&#128073; Activa TrustMed gratis y ten estas herramientas corriendo hoy. Link en bio.
+
+#TrustMed #HerramientaDelDia #FlujoDeCaja #PagadorVampiro #MedicosEnCrisis #FinanzasMedicas #GestionMedica #Colombia</div></div></div>
+        <div class="section-block"><div class="section-head"><h3>&#127912; Prompt de Imagen</h3><button class="copy-btn" onclick="copySibling(this)">Copiar Prompt</button></div><div class="section-body"><div class="prompt-display" data-copy>Two-feature showcase in a clean split-screen layout. Left side shows TrustMed's Caja (cash flow) module: a clear timeline chart showing cash projections for 30-60-90 days with green (positive) and red (alert) zones. Right side shows the Payer Analyzer: a ranked list of EPS and insurance companies with colored score badges (0-100). "Pagador Vampiro" label with subtle red alert icon on lowest scorer. Clean, professional medical SaaS interface. Dark background with bright data elements. 16:9 format.</div></div></div>
+    </div>
+        <div class="format-reel" style="display:none" id="reel-dia-6-b"></div>
+    </div>
+    <div id="dia-6-c" class="seg-content" style="display:none">
+        <div class="format-post">
+        <div class="cuando-usar type-c"><span class="cuando-icon">&#9432;</span> <div><strong>Cuando usar:</strong> Showcase del Simulador de Escenarios y Planes de Accion con IA. Para medicos que quieren ver las funcionalidades mas avanzadas de la plataforma.</div></div>
+        <div class="section-block"><div class="section-head"><h3>&#128203; Copy para Facebook</h3><button class="copy-btn" onclick="copySibling(this)">Copiar Copy</button></div><div class="section-body"><div class="copy-display" data-copy>&#128302; Herramienta del dia: <strong>Simulador de Escenarios + Planes de Accion con IA</strong>
+
+Esta es la combinacion que convierte a TrustMed de software financiero en <strong>ventaja estrategica real.</strong>
+
+<strong>Simulador de Escenarios - Como funciona:</strong>
+
+Ingresas tus datos actuales (facturacion, convenios, costos, tarifas) y el simulador genera modelos proyectados de lo que pasaria si:
+
+&#128200; Aumentas tus tarifas un 10%, 20% o 30%
+&#128260; Cambias tu mix de pacientes (mas particulares, menos EPS)
+&#127973; Abres una segunda sede en X zona
+&#128101; Contratas un medico adicional
+
+No son proyecciones teoricas. Son modelos basados en tus datos reales y los datos del mercado de TrustMed.
+
+<strong>Planes de Accion con IA - Como complementa:</strong>
+
+Una vez que el simulador muestra el escenario optimo para tu consultorio, el modulo de IA genera un plan de accion especifico:
+&#9989; Que pasos tomar y en que orden
+&#9989; Que metricas monitorear en el camino
+&#9989; Que riesgos anticipar
+
+<strong>La diferencia entre un medico que crece y uno que se estanca no es el esfuerzo. Es la calidad de las decisiones.</strong>
+
+Y la calidad de las decisiones depende de la calidad de la informacion.
+
+&#128073; Activa TrustMed y empieza a simular tu proximo paso. Link en bio.
+
+#TrustMed #HerramientaDelDia #SimuladorDeEscenarios #IA #PlanDeAccion #EstrategiaMedica #MedicinaDigital #DecisionesDatos #Colombia</div></div></div>
+        <div class="section-block"><div class="section-head"><h3>&#127912; Prompt de Imagen</h3><button class="copy-btn" onclick="copySibling(this)">Copiar Prompt</button></div><div class="section-body"><div class="prompt-display" data-copy>Futuristic, premium product showcase: A sleek laptop and tablet display showing TrustMed's Scenario Simulator. The laptop screen shows three parallel scenario charts (conservative/moderate/aggressive) with clear financial projections. The tablet shows the AI Action Plan interface with numbered steps and progress indicators. Premium dark UI with subtle blue gradient accents. The setup sits on a clean executive desk. Aspirational and cutting-edge aesthetic. Cinematic product photography. 16:9 format.</div></div></div>
+    </div>
+        <div class="format-reel" style="display:none" id="reel-dia-6-c"></div>
+    </div>
+</div>
+
+<!-- ===================== DIA 7 - DOMINGO ===================== -->
+<div id="dia-7" class="page-section">
+    <div class="page-header">
+        <div class="breadcrumb">Contenido Semanal &gt; Domingo</div>
+        <h2>Domingo - Motivacional / Vision</h2>
+        <p class="subtitle">Inspiracion sobre el futuro de la practica medica con datos. Cierre de semana poderoso.</p>
+        <div class="page-header-meta">
+            <span class="pill pill-time">9:00 AM</span>
+            <span class="pill pill-format">Post Motivacional</span>
+        </div>
+    </div>
+    <div class="seg-tabs">
+        <button class="seg-tab active-a" onclick="showSeg('dia-7','a',this)"><span class="seg-dot seg-dot-a"></span> Doctor Competitivo</button>
+        <button class="seg-tab" onclick="showSeg('dia-7','b',this)"><span class="seg-dot seg-dot-b"></span> Doctor en Crisis</button>
+        <button class="seg-tab" onclick="showSeg('dia-7','c',this)"><span class="seg-dot seg-dot-c"></span> Doctor Estratega</button>
+    </div>
+    <div class="format-toggle" id="fmt-7">
+        <button class="fmt-btn active" onclick="switchFormat('dia-7','post',this)">Post Facebook</button>
+        <button class="fmt-btn" onclick="switchFormat('dia-7','reel',this)">Reel / Video</button>
+    </div>
+    <div id="dia-7-a" class="seg-content">
+        <div class="format-post">
+        <div class="cuando-usar type-a"><span class="cuando-icon">&#9432;</span> <div><strong>Cuando usar:</strong> Copy aspiracional para el domingo. Inspira al medico competitivo sobre el futuro de los que usan inteligencia de mercado. Tono de liderazgo y vision.</div></div>
+        <div class="section-block"><div class="section-head"><h3>&#128203; Copy para Facebook</h3><button class="copy-btn" onclick="copySibling(this)">Copiar Copy</button></div><div class="section-body"><div class="copy-display" data-copy>&#127942; El medico del futuro no solo es el mejor clinicamente. Es el mejor estrategicamente.
+
+Piensalo un momento.
+
+En tu especialidad, probablemente hay docenas de medicos igual de capaces que tu. Con la misma formacion. Con anos de experiencia. Con buena reputacion.
+
+Entonces, ¿que diferenciara al que lidere el mercado en los proximos 5 anos?
+
+No sera quien trabaje mas horas.
+No sera quien tenga mas titulos.
+
+<strong>Sera quien tome mejores decisiones. Con mejor informacion. Mas rapido.</strong>
+
+El medico competitivo del futuro va a saber:
+&#128200; Exactamente donde esta posicionado en su mercado en tiempo real
+&#128161; Que procedimientos son mas rentables y como estan evolucionando los precios
+&#127758; Donde estan las oportunidades que sus competidores no ven todavia
+&#128302; Que pasara si toma decision A vs decision B antes de tomarla
+
+Eso no es ciencia ficcion. Es lo que TrustMed entrega hoy.
+
+El futuro de la practica medica combina excelencia clinica con inteligencia de negocio.
+
+Los que empiezan a construir esa inteligencia ahora tendran una ventaja que sera muy dificil de alcanzar despues.
+
+<strong>¿En que lado de esa curva quieres estar?</strong>
+
+&#128073; Empieza hoy. Demo gratuita disponible. Link en bio.
+
+#TrustMed #VisionMedica #FuturoMedico #LiderazgoMedico #InteligenciaCompetitiva #MedicinaDigital #ConsultorioDelFuturo #Colombia</div></div></div>
+        <div class="section-block"><div class="section-head"><h3>&#127912; Prompt de Imagen</h3><button class="copy-btn" onclick="copySibling(this)">Copiar Prompt</button></div><div class="section-body"><div class="prompt-display" data-copy>Aspirational, visionary scene: A confident Latin American doctor in a modern medical office at golden hour. Large floor-to-ceiling windows with a city skyline view. The doctor stands looking at the city with a TrustMed dashboard glowing on a screen behind them showing market leadership metrics. Cinematic, warm lighting. Inspirational and forward-looking aesthetic. The image communicates success, vision, and leadership. High-end photography style. 16:9 format.</div></div></div>
+    </div>
+        <div class="format-reel" style="display:none" id="reel-dia-7-a"></div>
+    </div>
+    <div id="dia-7-b" class="seg-content" style="display:none">
+        <div class="format-post">
+        <div class="cuando-usar type-b"><span class="cuando-icon">&#9432;</span> <div><strong>Cuando usar:</strong> Motivacional orientado a la esperanza y la salida de la crisis. Para medicos que han tenido una semana dura. El tono es humano, cercano y esperanzador.</div></div>
+        <div class="section-block"><div class="section-head"><h3>&#128203; Copy para Facebook</h3><button class="copy-btn" onclick="copySibling(this)">Copiar Copy</button></div><div class="section-body"><div class="copy-display" data-copy>&#10084; Si esta semana fue dificil, este mensaje es para ti.
+
+Nadie te enseno en la facultad de medicina como manejar las finanzas de un consultorio.
+
+Te ensenaron a diagnosticar, a tratar, a salvar vidas. Eso lo haces increiblemente bien.
+
+Pero el negocio... el negocio nadie te lo enseno. Y no es tu culpa.
+
+Las EPS que no pagan. Los convenios que no son rentables. El flujo de caja que no cuadra. La sensacion de que trabajas mas y ganas menos.
+
+Eso no significa que seas mal medico. Significa que necesitas mejores herramientas para la parte del negocio.
+
+<strong>La buena noticia:</strong>
+
+La situacion financiera de un consultorio, por dificil que sea, casi siempre tiene diagnostico. Y todo diagnostico tiene tratamiento.
+
+TrustMed fue construido exactamente para esto: para que medicos como tu tengan la informacion que necesitan para tomar las decisiones correctas.
+
+No para reemplazar tu criterio. Para potenciarlo con datos.
+
+Esta semana que empieza puede ser diferente. No porque las circunstancias cambien de la noche a la manana, sino porque <strong>puedes empezar a tomar decisiones basadas en informacion real, no en intuicion.</strong>
+
+Eso cambia todo. Poco a poco. Pero cambia.
+
+&#128073; Empieza la semana con un diagnostico real de tu consultorio. Demo gratuita. Link en bio.
+
+#TrustMed #Motivacional #MedicosEnCrisis #FinanzasMedicas #EspirituDeMedico #ConsultorioMedico #Colombia #NuevoComienzo</div></div></div>
+        <div class="section-block"><div class="section-head"><h3>&#127912; Prompt de Imagen</h3><button class="copy-btn" onclick="copySibling(this)">Copiar Prompt</button></div><div class="section-body"><div class="prompt-display" data-copy>Warm, emotional Sunday morning scene: A doctor (gender-neutral presentation) sits at a peaceful home desk with morning light streaming through a window. A cup of coffee nearby. Their laptop displays TrustMed's welcoming dashboard with a clean financial overview. Expression is calm and hopeful. The tone is warm, human, and optimistic. Soft morning color palette (warm yellows and soft whites). Photorealistic and emotionally resonant. 16:9 format.</div></div></div>
+    </div>
+        <div class="format-reel" style="display:none" id="reel-dia-7-b"></div>
+    </div>
+    <div id="dia-7-c" class="seg-content" style="display:none">
+        <div class="format-post">
+        <div class="cuando-usar type-c"><span class="cuando-icon">&#9432;</span> <div><strong>Cuando usar:</strong> Vision de largo plazo para el medico estratega. Copy que lo conecta con el tipo de medico que quiere ser y el rol que los datos juegan en esa vision.</div></div>
+        <div class="section-block"><div class="section-head"><h3>&#128203; Copy para Facebook</h3><button class="copy-btn" onclick="copySibling(this)">Copiar Copy</button></div><div class="section-body"><div class="copy-display" data-copy>&#128200; El medico mas exitoso no es el que mas trabaja. Es el que mejor decide.
+
+Hay dos tipos de medicos que construyen consultorios solidos:
+
+<strong>El que reacciona:</strong>
+Toma decisiones cuando los problemas ya son urgentes. Cambia precios cuando ya perdio pacientes. Ajusta convenios cuando el flujo ya es negativo. Expande cuando ya no puede mas en el espacio actual.
+
+<strong>El que anticipa:</strong>
+Tiene datos antes de que los problemas lleguen. Ve las oportunidades antes que sus competidores. Simula el futuro antes de comprometerlo. Crece de forma planificada, no por accidente.
+
+La diferencia entre estos dos medicos no es inteligencia ni esfuerzo. Es informacion.
+
+El medico que anticipa tiene KPIs claros, sabe como esta su mercado, monitorea sus pagadores, simula escenarios y actua con base en datos reales.
+
+<strong>Eso es exactamente lo que TrustMed construyo:</strong>
+
+Una plataforma para que el medico estratega tenga el mismo nivel de inteligencia de negocio que tienen los grandes sistemas de salud... pero para el consultorio individual.
+
+Democratizar la inteligencia financiera en medicina. Esa es nuestra mision.
+
+<strong>¿Que tipo de medico quieres ser los proximos 5 anos?</strong>
+
+&#128073; El primer paso es activar TrustMed. Demo gratuita disponible. Link en bio.
+
+#TrustMed #VisionMedica #MedicoEstrategico #DecisionesDatos #FuturoMedico #GestionMedica #MedicinaDigital #Colombia #PlanificacionMedica</div></div></div>
+        <div class="section-block"><div class="section-head"><h3>&#127912; Prompt de Imagen</h3><button class="copy-btn" onclick="copySibling(this)">Copiar Prompt</button></div><div class="section-body"><div class="prompt-display" data-copy>Dual-panel Sunday vision board concept. Left side (slightly blurry, muted colors): A reactive doctor surrounded by problems - urgent papers, ringing phone, stressed body language. Right side (sharp, vibrant): The same doctor as a strategic leader, standing confidently in front of a TrustMed analytics dashboard showing growth curves, market position, and financial health. Clean, aspirational design. Text overlay: "El medico que reacciona vs el medico que anticipa." Professional medical business aesthetic. 16:9 format.</div></div></div>
+    </div>
+        <div class="format-reel" style="display:none" id="reel-dia-7-c"></div>
+    </div>
+</div>
+
+<!-- ===================== RESUMEN Y GUIA ===================== -->
+<div id="resumen" class="page-section">
+    <div class="page-header">
+        <div class="breadcrumb">Guia &gt; Resumen Ejecutivo</div>
+        <h2>Guia de Uso de los Copys</h2>
+        <p class="subtitle">Como elegir, rotar y optimizar los 21 copys segun tu audiencia y objetivos.</p>
+    </div>
+
+    <div class="note-box info" style="margin-bottom:1.5rem">
+        <span style="font-size:1.1rem;flex-shrink:0">&#128161;</span>
+        <div>Tienes <strong>21 copys totales</strong> (7 dias x 3 segmentos). Cada dia tiene 3 variantes adaptadas a un perfil de audiencia diferente. Usa esta guia para maximizar resultados.</div>
+    </div>
+
+    <div class="section-block">
+        <div class="section-head"><h3>&#127919; Los 3 Segmentos de Audiencia</h3></div>
+        <div class="section-body">
+            <div class="seg-card seg-a">
+                <h4 style="color:var(--seg-a)">Segmento A: Doctor Competitivo</h4>
+                <p><strong>Perfil:</strong> Quiere saber como esta posicionado vs la competencia. Le interesa benchmarking, precios del mercado, inteligencia competitiva.<br>
+                <strong>Dolor:</strong> "No se si estoy cobrando bien vs otros medicos de mi zona."<br>
+                <strong>Motivacion:</strong> Liderazgo de mercado, estar un paso adelante.<br>
+                <strong>Herramientas clave:</strong> TrustMap, Pricing Intelligence.</p>
+            </div>
+            <div class="seg-card seg-b">
+                <h4 style="color:var(--seg-b)">Segmento B: Doctor en Crisis</h4>
+                <p><strong>Perfil:</strong> Esta perdiendo dinero sin saber por que. Pagadores morosos, flujo de caja negativo.<br>
+                <strong>Dolor:</strong> "Trabajo mucho pero no veo la plata", "Las EPS me deben meses."<br>
+                <strong>Motivacion:</strong> Sobrevivencia financiera, dejar de perder dinero.<br>
+                <strong>Herramientas clave:</strong> Caja, Analizador de Pagadores, Pagador Vampiro.</p>
+            </div>
+            <div class="seg-card seg-c">
+                <h4 style="color:var(--seg-c)">Segmento C: Doctor Estratega</h4>
+                <p><strong>Perfil:</strong> Quiere crecer de manera planificada. Simular escenarios, tomar decisiones basadas en datos.<br>
+                <strong>Dolor:</strong> "Quiero expandirme pero no se si es viable."<br>
+                <strong>Motivacion:</strong> Crecimiento inteligente, decisiones basadas en datos.<br>
+                <strong>Herramientas clave:</strong> Simulador de Escenarios, Planes de Accion IA.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-block">
+        <div class="section-head"><h3>&#128197; Resumen Semanal</h3></div>
+        <div class="section-body">
+            <table class="sum-table">
+                <thead><tr><th>Dia</th><th>Tema</th><th>Seg. A</th><th>Seg. B</th><th>Seg. C</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>Lunes</strong></td><td>Inteligencia de Mercado</td><td>TrustMap + posicion</td><td>Cobras bien?</td><td>Expansion informada</td></tr>
+                    <tr><td><strong>Martes</strong></td><td>Alerta Financiera</td><td>Pagador Vampiro eficiencia</td><td>EPS que te drenan</td><td>Portfolio de pagadores</td></tr>
+                    <tr><td><strong>Miercoles</strong></td><td>Caso de Exito</td><td>Dermatologo +28%</td><td>Pediatra salvada</td><td>Ortopedista expansion</td></tr>
+                    <tr><td><strong>Jueves</strong></td><td>Tip Estrategico</td><td>5 datos de mercado</td><td>Flujo negativo: que revisar</td><td>Simula 3 escenarios</td></tr>
+                    <tr><td><strong>Viernes</strong></td><td>Mito vs Realidad</td><td>"Ya se los precios"</td><td>"Mas pacientes = mas $"</td><td>"Excel es suficiente"</td></tr>
+                    <tr><td><strong>Sabado</strong></td><td>Herramienta Destacada</td><td>TrustMap + Pricing</td><td>Caja + Pagadores</td><td>Simulador + IA</td></tr>
+                    <tr><td><strong>Domingo</strong></td><td>Motivacional / Vision</td><td>Liderazgo estrategico</td><td>Hay salida con datos</td><td>Reaccionar vs anticipar</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="section-block">
+        <div class="section-head"><h3>&#128640; Estrategia de Rotacion</h3></div>
+        <div class="section-body">
+            <div class="note-box warn">
+                <span style="font-size:1rem;flex-shrink:0">&#9888;</span>
+                <div><strong>Regla de oro:</strong> No publiques los 3 segmentos el mismo dia. Elige UNO por dia segun tu audiencia actual.</div>
+            </div>
+            <div style="font-size:0.85rem; line-height:1.8; color:var(--g700)">
+                <p><strong>Si tu audiencia actual son medicos establecidos con consultorios funcionando:</strong><br>
+                Prioriza Segmento A (Competitivo) y C (Estratega). Alterna entre ambos durante la semana.</p>
+                <p style="margin-top:0.75rem"><strong>Si estas en prospeccion fria o tu audiencia tiene consultorios pequenos/recientes:</strong><br>
+                Prioriza Segmento B (Crisis) para mayor resonancia emocional y conversion directa.</p>
+                <p style="margin-top:0.75rem"><strong>Rotacion optima:</strong><br>
+                Semana 1: A, B, A, C, B, A, C<br>
+                Semana 2: B, A, C, B, A, C, B<br>
+                Semana 3: C, C, B, A, C, B, A</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-block">
+        <div class="section-head"><h3>&#128200; Dias de Mayor Conversion</h3></div>
+        <div class="section-body" style="font-size:0.85rem; line-height:1.8; color:var(--g700)">
+            <p><strong>Martes (Alerta Financiera):</strong> El dolor es mas urgente, conversion directa alta. Ideal para campanas pagas.</p>
+            <p style="margin-top:0.5rem"><strong>Jueves (Tip Estrategico):</strong> Alto valor percibido, ideal para captar leads educados. Buen engagement organico.</p>
+            <p style="margin-top:0.5rem"><strong>Sabado (Herramienta Destacada):</strong> Mayor tiempo de lectura disponible, mejor para demo requests y contenido detallado.</p>
+        </div>
+    </div>
+
+    <div class="section-block">
+        <div class="section-head"><h3>&#128172; A/B Testing Sugerido</h3></div>
+        <div class="section-body" style="font-size:0.85rem; line-height:1.8; color:var(--g700)">
+            <p>Corre Variante A vs Variante B el mismo dia con presupuesto dividido 50/50 durante las primeras 2 semanas para identificar que segmento responde mejor en tu audiencia actual.</p>
+            <p style="margin-top:0.5rem">Luego concentra el 70% del presupuesto en el segmento ganador y 30% en los otros dos para seguir diversificando.</p>
+        </div>
+    </div>
+</div>
+
+        </div>
+    </div>
+</div>
+
+<!-- ===================== GUIA PRODUCCION ===================== -->
+<div id="produccion" class="page-section">
+    <div class="page-header">
+        <div class="breadcrumb">Guia &gt; Produccion de Reels</div>
+        <h2>Guia de Produccion de Reels</h2>
+        <p class="subtitle">Todo lo que necesitas para grabar y publicar los 21 reels con tu celular.</p>
+    </div>
+    <div class="section-block"><div class="section-head"><h3>&#127916; Checklist Antes de Grabar</h3></div><div class="section-body">
+        <div class="prod-check">Guion impreso o en teleprompter (app gratuita en celular)</div>
+        <div class="prod-check">Iluminacion: luz natural frontal o ring light</div>
+        <div class="prod-check">Fondo: consultorio ordenado o fondo liso profesional</div>
+        <div class="prod-check">Camara: celular en vertical, tripode o estabilizador</div>
+        <div class="prod-check">Audio: microfono de solapa o AirPods con microfono</div>
+    </div></div>
+    <div class="section-block"><div class="section-head"><h3>&#9999; Edicion en CapCut</h3></div><div class="section-body" style="font-size:0.84rem;line-height:1.8;color:var(--g700)">
+        <p><strong>Textos:</strong> Fuente bold, contraste alto (blanco sobre negro o viceversa)</p>
+        <p><strong>Cortes:</strong> Cada 3-5 segundos para mantener atencion</p>
+        <p><strong>Transiciones:</strong> Cortes directos para reels energicos, fundidos suaves para motivacionales</p>
+        <p><strong>Screen recordings:</strong> Graba el demo en celular o tablet y edita sobre el guion</p>
+    </div></div>
+    <div class="section-block"><div class="section-head"><h3>&#128337; Horarios Optimos</h3></div><div class="section-body" style="font-size:0.84rem;line-height:1.8;color:var(--g700)">
+        <p><strong>Manana:</strong> 6:30 - 8:30 AM (hora Colombia)</p>
+        <p><strong>Mediodia:</strong> 12:00 - 1:00 PM</p>
+        <p><strong>Noche:</strong> 7:00 - 9:00 PM</p>
+        <p style="margin-top:0.5rem"><strong>Tip:</strong> Usa el primer frame del reel como thumbnail con el texto del hook.</p>
+    </div></div>
+    <div class="section-block"><div class="section-head"><h3>&#127991; Hashtags por Dia</h3></div><div class="section-body">
+        <table class="sum-table"><thead><tr><th>Dia</th><th>Hashtags Sugeridos</th></tr></thead><tbody>
+            <tr><td><strong>Lunes</strong></td><td>#MedicinaDeNegocios #ConsultorioMedico #SaludFinanciera</td></tr>
+            <tr><td><strong>Martes</strong></td><td>#FinanzasMedicas #GestionConsultorio #EPSColombia</td></tr>
+            <tr><td><strong>Miercoles</strong></td><td>#CasoDeExito #MedicoEmprendedor #TrustMed</td></tr>
+            <tr><td><strong>Jueves</strong></td><td>#TipMedico #KPIsConsultorio #DatosParaMedicos</td></tr>
+            <tr><td><strong>Viernes</strong></td><td>#MitoVsRealidad #NegocioMedico #SaludFinanciera</td></tr>
+            <tr><td><strong>Sabado</strong></td><td>#HerramientaMedica #TechSalud #GestionMedica</td></tr>
+            <tr><td><strong>Domingo</strong></td><td>#MotivacionMedica #VisionMedica #MedicoExitoso</td></tr>
+        </tbody></table>
+    </div></div>
+    <div class="section-block"><div class="section-head"><h3>&#127912; Estilos de Reel</h3></div><div class="section-body" style="font-size:0.84rem;line-height:1.8;color:var(--g700)">
+        <p><strong>Talking head:</strong> Medico hablando directo a camara (el mas comun y efectivo)</p>
+        <p><strong>POV:</strong> Punto de vista del medico revisando datos en pantalla</p>
+        <p><strong>Texto animado:</strong> Solo texto con musica trending, sin cara</p>
+        <p><strong>Storytelling:</strong> Mini historia narrada con cortes rapidos</p>
+        <p><strong>Screen recording:</strong> Demo simulado de la plataforma</p>
+        <p><strong>Split screen:</strong> Antes/despues o mito/realidad lado a lado</p>
+    </div></div>
+</div>
+
+<!-- TOAST -->
+<div id="toast" class="toast"></div>
+
+<script>
+// ========== REEL DATA ==========
+const REELS={};
+REELS["dia-1-a"]={hook:"Tu colega que abre consultorio a 3 cuadras... ya sabe cuanto cobras tu.",voice:[["0-3s","Tu colega que abre consultorio a 3 cuadras... ya sabe cuanto cobras tu."],["3-8s","Y si el cobra menos, adivina quien se queda con tus pacientes este mes."],["8-15s","En medicina siempre nos ensenaron a competir con conocimiento. Pero nadie nos dijo que eso incluia conocer el mercado de tu zona."],["15-25s","TrustMed tiene algo que se llama TrustMap. Es un mapa interactivo que te muestra exactamente cuantos consultorios hay en tu radio de 2, 5 o 10 kilometros. Que especialidades ofrecen. Y con Pricing Intelligence, puedes comparar tus tarifas vs lo que cobra el mercado en tu zona."],["25-35s","No para bajar tus precios. Para saber si los puedes subir sin perder un solo paciente."],["35-45s","El doctor que tiene esta informacion toma decisiones. El que no... reacciona cuando ya perdio terreno."],["45-50s","Informacion es poder. En medicina, es supervivencia."]],video:[["0-3s","Talking head. Medico mirando directo a camara, gesto de secreto/complicidad."],["3-8s","Mismo plano. Pausa dramatica despues de 'adivina quien.'"],["8-15s","Corte rapido a plano mas cercano. Medico gesticula naturalmente."],["15-25s","Transicion a screen recording simulado del TrustMap. Mano senalando puntos en mapa."],["25-35s","Voz en off sobre el mapa. Zoom a comparacion de precios."],["35-45s","Corte de regreso a talking head. Medico asiente con conviccion."],["45-50s","Frase final en texto animado sobre fondo oscuro."]],screen:[["0s","Tu colega ya sabe cuanto cobras."],["15s","TRUSTMAP: mapa de competencia en tu zona"],["22s","Pricing Intelligence: tus precios vs el mercado"],["35s","Subir precios sin perder pacientes = datos"],["47s","TrustMed | Consultorios que lideran"]],cta:"Si quieres ver cuantos competidores tienes en tu zona ahora mismo, el link esta en mi bio. Primeros 30 dias gratis.",music:"Lo-fi corporativo con tension progresiva. Sube levemente en los momentos de revelacion de datos."};
+REELS["dia-1-b"]={hook:"Doctor... estas cobrando lo que mereces? O lo que te da miedo cobrar?",voice:[["0-3s","Doctor... estas cobrando lo que mereces? O lo que te da miedo cobrar?"],["3-10s","Porque hay una diferencia enorme entre los dos. Y esa diferencia se llama informacion."],["10-18s","La mayoria de medicos define sus tarifas como los definio hace 3 anos. O como cobran sus colegas. Sin saber absolutamente nada del mercado real."],["18-28s","Con TrustMed puedes ver en segundos cuanto cobra el mercado en tu zona para tu especialidad. Tienes el dato real. No el rumor."],["28-38s","Y lo mas importante: si el mercado cobra mas que tu, tienes una oportunidad de oro para subir tus tarifas con argumentos."],["38-47s","El miedo a cobrar mas se cura con informacion. No con valentia ciega."],["47-52s","Deja de adivinar. Empieza a decidir con datos."]],video:[["0-3s","Texto animado. Fondo negro. Texto aparece letra por letra en tipografia bold."],["3-10s","Corte a talking head. Medico joven, tono directo y empatico."],["10-18s","Talking head. Medico cuenta con dedos cada variante."],["18-28s","Screen recording simulado. Dashboard mostrando comparativo de tarifas en grafico de barras."],["28-38s","Voz en off sobre el grafico. Se marcan escenarios con circulos animados."],["38-47s","Regreso a talking head. Tono mas cercano, casi confidencial."],["47-52s","Texto final animado. Fondo oscuro con logo TrustMed."]],screen:[["0s","Cobras lo que mereces... o lo que te da miedo cobrar?"],["10s","La mayoria define tarifas sin datos reales"],["20s","Tu tarifa vs el mercado en tu zona"],["38s","El miedo a cobrar mas se cura con informacion"],["50s","30 dias gratis | TrustMed"]],cta:"Si no sabes cuanto cobra el mercado en tu zona, eso ya es un problema. El link en bio te da acceso en menos de 5 minutos.",music:"Inicio con musica tensa/intrigante. A los 18s transicion a algo mas esperanzador cuando aparecen los datos."};
+REELS["dia-1-c"]={hook:"Que pasaria si pudieras ver el tablero de tu competencia... legalmente?",voice:[["0-3s","Que pasaria si pudieras ver el tablero de tu competencia... legalmente?"],["3-12s","No estoy hablando de espionaje. Estoy hablando de inteligencia de mercado. Que es exactamente lo que usan las grandes clinicas y lo que los consultorios independientes casi nunca tienen."],["12-22s","TrustMed tiene dos herramientas que cambian esto completamente. El TrustMap te muestra la densidad de competencia en tu zona. Y Pricing Intelligence cruza tarifas del mercado con tu especialidad."],["22-32s","El resultado: un mapa de oportunidades. Ves donde hay saturacion y donde hay espacios vacios."],["32-42s","Un consultorio en Bogota uso esto para detectar alta demanda de medicina estetica y poca oferta. Abrio ese servicio. En 4 meses duplico su ticket promedio."],["42-50s","La informacion de mercado no es exclusiva para las grandes. Ya."],["50-58s","Si tomas decisiones sin datos de mercado, estas apostando. Con TrustMed, estas estrategizando."]],video:[["0-3s","Talking head. Medico con actitud de 'voy a contarte algo valioso.'"],["3-12s","Mismo plano. Tono de profesor que comparte un secreto de la industria."],["12-22s","Corte animado al TrustMap. Mapa con pins de colores. Zoom progresivo."],["22-32s","Continua sobre el mapa. Zonas rojas (saturadas) y verdes (oportunidad)."],["32-42s","Regreso a talking head para contar el caso. Medico gesticula emocionado."],["42-50s","Texto bold animado: 'La informacion ya no es exclusiva para las grandes.'"],["50-58s","CTA visual con el logo."]],screen:[["0s","Ver el tablero de tu competencia... legalmente"],["14s","TrustMap + Pricing Intelligence"],["22s","Saturacion vs Oportunidad: lo ves en segundos"],["33s","Caso real: duplico ticket promedio en 4 meses"],["52s","Apostando vs Estrategizando"]],cta:"El link en bio. Prueba gratuita 30 dias. Ve tu mapa de competencia hoy mismo.",music:"Musica corporativa moderna, estilo 'tech startup' con ritmo constante."};
+REELS["dia-2-a"]={hook:"Tienes pacientes... pero no tienes plata. Eso tiene nombre y se llama problema de pagadores.",voice:[["0-3s","Tienes pacientes... pero no tienes plata. Eso tiene nombre y se llama problema de pagadores."],["3-10s","Y si no lo resuelves, no importa cuantos pacientes tengas. Tu consultorio va a sangrar plata mes a mes."],["10-20s","El problema no es cuanto cobras. El problema es quien te paga, cuanto tarda en pagarte, y cuanto te descuenta sin que te des cuenta."],["20-32s","TrustMed tiene el Analisis de Pagadores. Clasifica automaticamente cada EPS, prepagada o particular. Score de Pagador entre 0 y 100."],["32-42s","Un pagador con score 20 no es un cliente. Es un costo disfrazado de ingreso."],["42-50s","Los consultorios que lideran no son los que tienen mas pacientes. Son los que tienen los pagadores correctos."],["50-58s","Saber quien te paga bien no es lujo. Es supervivencia financiera."]],video:[["0-3s","Talking head. Medico con expresion seria, directa. Texto en pantalla con hook."],["3-10s","Acercamiento lento a la camara. Tono urgente pero calmo."],["10-20s","Pattern interrupt: mano entra al frame y senala tres dedos."],["20-32s","Screen recording del dashboard. Lista de pagadores con barras de colores."],["32-42s","Zoom al Score de Pagador. Numero '23' en rojo parpadeando."],["42-50s","Regreso a talking head. Levanta una ceja en 'costo disfrazado.'"],["50-58s","Texto bold animado sobre fondo oscuro."]],screen:[["0s","Pacientes si. Plata no. Problema de pagadores."],["20s","Score de Pagador: 0 a 100"],["32s","Score 20 = costo disfrazado de ingreso"],["45s","Los consultorios que lideran tienen los pagadores correctos"],["56s","TrustMed | Controla quien te paga"]],cta:"Descubre el score de tus pagadores. Link en bio, 30 dias sin costo.",music:"Inicio tenso. Transicion a ritmo electro-corporativo cuando aparece el dashboard."};
+REELS["dia-2-b"]={hook:"Esta EPS lleva 4 meses sin pagarte... y tu sigues atendiendo sus pacientes.",voice:[["0-3s","Esta EPS lleva 4 meses sin pagarte... y tu sigues atendiendo sus pacientes."],["3-8s","Y sabes lo peor? Hay medicos que llevan anos en esa situacion y ni siquiera saben cuanto les deben."],["8-18s","Porque la plata 'esta ahi.' En algun estado de cuenta. En alguna radicacion. Y mientras tanto, tu pones el consultorio, pagas el arriendo, pagas el personal, y esperas."],["18-28s","Eso tiene un nombre tecnico: Pagador Vampiro. Un pagador que consume tus servicios pero drena tu flujo de caja hasta dejarte seco."],["28-38s","TrustMed detecta automaticamente estos perfiles. Cruza tiempos de pago, montos pendientes, descuentos. Y te muestra cuanto te esta costando realmente mantener ese contrato."],["38-48s","No para que entres en panico. Para que tomes una decision con informacion. Renegociar. Limitar atencion. O simplemente decir que no."],["48-55s","No eres una entidad de caridad. Eres un negocio medico. Y mereces que te paguen."]],video:[["0-3s","Texto animado impactante. Fondo rojo oscuro. Letras grandes."],["3-8s","Corte a talking head. Expresion empatica."],["8-18s","Talking head. Gesticula contando: 'consultorio, arriendo, personal.'"],["18-28s","Pattern interrupt: 'PAGADOR VAMPIRO' en texto animado sobre fondo negro."],["28-38s","Screen recording. Dashboard mostrando EPS con indicadores en rojo."],["38-48s","Voz en off sobre el dashboard. Se resaltan los numeros."],["48-55s","Regreso a talking head. Tono firme y empoderador."]],screen:[["0s","4 meses sin pago... y sigues atendiendo."],["18s","PAGADOR VAMPIRO: te consume pero no te paga"],["28s","TrustMed lo detecta automaticamente"],["40s","Cuanto te cuesta realmente ese contrato?"],["52s","Mereces que te paguen. Siempre."]],cta:"Si tienes una EPS o pagador que te preocupa, link en bio. 30 dias gratis.",music:"Inicio con tension dramatica. Transicion a algo mas esperanzador con la solucion."};
+REELS["dia-2-c"]={hook:"El riesgo financiero mas grande de tu consultorio no esta en tus costos. Esta en tus pagadores.",voice:[["0-3s","El riesgo financiero mas grande de tu consultorio no esta en tus costos. Esta en tus pagadores."],["3-12s","Cualquier consultor te va a hablar de reducir gastos. Pero pocos hablan del riesgo de concentracion de pagadores. Que pasa cuando el 60% de tus ingresos depende de una sola EPS con problemas de liquidez?"],["12-22s","Eso no es un problema operativo. Es un riesgo estrategico. Y requiere una respuesta estrategica."],["22-35s","El Analisis de Pagadores de TrustMed te da: Score del 0 al 100, dias promedio de pago, porcentaje de glosas, tendencia historica. Todo en un solo dashboard."],["35-45s","Puedes segmentar tu mix deliberadamente. Aumentar particulares o prepagadas premium. Negociar mejores condiciones usando tus propios datos."],["45-53s","Los consultorios con estabilidad financiera no son los que cobran mas. Son los que gestionan mejor a quienes les cobran."],["53-60s","Eso es estrategia de pagadores. Y TrustMed es la unica plataforma en Colombia que te la da."]],video:[["0-3s","Talking head. Tono de conferencista. Seguro, directo."],["3-12s","Corte a infografia animada: pastel chart '60% una sola EPS' con 'Riesgo de concentracion.'"],["12-22s","Voz sobre la infografia mientras el grafico cambia a rojo."],["22-35s","Screen recording del dashboard. Navegando lista de pagadores, perfil completo."],["35-45s","Screen recording. Se muestra como cambia el mix de pagadores."],["45-53s","Regreso a talking head para el cierre estrategico."],["53-60s","Logo TrustMed + texto CTA."]],screen:[["0s","El riesgo mas grande: tus pagadores"],["5s","Riesgo de concentracion: 60% en una EPS"],["22s","Score | Dias de pago | Glosas | Tendencia"],["38s","Segmenta tu mix de pagadores"],["56s","Unica plataforma en Colombia con estrategia de pagadores"]],cta:"El link en bio. 30 dias para analizar cada uno de tus pagadores con datos reales.",music:"Musica corporativa sofisticada. Estilo 'executive briefing.' Elegante."};
+REELS["dia-3-a"]={hook:"Este medico descubrio que estaba cobrando 40% menos que todos en su zona. Lo que hizo despues cambio su consultorio.",voice:[["0-3s","Este medico descubrio que estaba cobrando 40% menos que todos en su zona."],["3-10s","Un internista en Medellin. Consultorio propio hace 6 anos. Buenos pacientes. Pero siempre con la plata justa."],["10-20s","Activo Pricing Intelligence y el dato fue un balde de agua fria: el mercado cobraba 40% mas que el. El habia mantenido precios 'para no perder pacientes.'"],["20-30s","Pero el dato no mintio. El miedo si."],["30-40s","Subio tarifas gradualmente en 3 meses. Perdio 8% de pacientes de menor valor. Su ingreso mensual subio 31%."],["40-50s","Ocho por ciento menos de pacientes. Treinta y uno por ciento mas de plata. Eso es inteligencia de mercado aplicada."],["50-58s","El no adivino. El tuvo el dato. Y actuo con el."]],video:[["0-3s","Texto animado en pantalla completa. Letras grandes, fondo oscuro."],["3-10s","Talking head. Medico narra como historia a un colega."],["10-20s","Screen recording del Pricing Intelligence. Dos barras: brecha del 40%."],["20-30s","Regreso talking head. Pausa dramatica en 'el miedo si.'"],["30-40s","Animacion tipo infografia: linea de tiempo de 3 meses. 'Ingresos +31%.'"],["40-50s","Talking head de cierre. Sonrie al decir los numeros."],["50-58s","Texto: '-8% pacientes. +31% ingresos.' Logo TrustMed."]],screen:[["0s","Cobraba 40% menos que su competencia. Sin saberlo."],["12s","Pricing Intelligence: tu precio vs el mercado"],["22s","El dato no mintio. El miedo si."],["33s","Plan de 3 meses: subida gradual de precios"],["43s","-8% pacientes / +31% ingresos"]],cta:"Si quieres saber donde estas parado vs tu mercado, link en bio. 30 dias gratis.",music:"Estilo 'hero moment.' Crece en la revelacion del dato, punto alto en '+31%'."};
+REELS["dia-3-b"]={hook:"Su flujo de caja estaba en rojo. Cuatro meses despues, cerro el mejor trimestre de su historia.",voice:[["0-3s","Su flujo de caja estaba en rojo. Cuatro meses despues, cerro el mejor trimestre de su historia."],["3-10s","Ginecologa en Bogota. Dos EPS con mora superior a 90 dias. Flujo negativo por tercer mes. Ya evaluaba cerrar."],["10-20s","Activo el modulo de Caja. Por primera vez vio con claridad donde entraba la plata y donde salia. El patron real del problema."],["20-30s","71% de sus ingresos dependia de dos pagadores con Score por debajo de 35. Pagadores Vampiro."],["30-40s","Con Planes de Accion con IA: limitar autorizaciones, aumentar particulares y prepagada, renegociar condiciones."],["40-50s","En cuatro meses, su mix de pagadores cambio. Flujo de caja paso de rojo a positivo por primera vez en un ano."],["50-58s","No necesito mas pacientes. Necesito mejores datos para mejores decisiones."]],video:[["0-3s","Texto dramatico. Fondo rojo transicion a verde."],["3-10s","Talking head. Tono de 'esto le paso a alguien como tu.'"],["10-20s","Screen recording del modulo de Caja. Barras negativas visibles."],["20-30s","Dashboard de Pagadores. Dos EPS en rojo. Score: 28 y 31."],["30-40s","Planes de Accion de IA generados automaticamente."],["40-50s","Grafico animado: antes (rojo) vs despues (verde)."],["50-58s","Talking head de cierre. Frase empodadora."]],screen:[["0s","Flujo en rojo. 4 meses despues: mejor trimestre."],["12s","Modulo de Caja: ve el patron real"],["22s","71% dependencia en pagadores con Score bajo 35"],["33s","Planes de Accion con IA"],["52s","No mas pacientes. Mejores decisiones."]],cta:"Si tu caja esta apretada, empieza por entender por que. Link en bio, 30 dias gratis.",music:"Comienza tensa. Punto de inflexion a los 30s con la solucion. Cierra esperanzadora."};
+REELS["dia-3-c"]={hook:"Simulo 3 escenarios financieros antes de abrir su segundo consultorio. Solo uno tenia sentido. Ese abrio.",voice:[["0-3s","Simulo 3 escenarios antes de abrir su segundo consultorio. Solo uno tenia sentido."],["3-12s","Cirujano plastico en Cali. Consultorio consolidado. La pregunta: abro segundo punto, contrato mas personal, o amplio espacio actual?"],["12-22s","Antes de TrustMed: intuicion, contador y mucho riesgo. Con TrustMed: el Simulador de Escenarios."],["22-35s","3 escenarios con variables reales. Expandir espacio: retorno a 8 meses. Contratar: 14 meses. Segundo consultorio: negativo en primer ano con el mix actual."],["35-45s","No porque fuera mala idea. Sino porque con ese mix de pagadores sin ajustarlo primero, era demasiado arriesgada."],["45-52s","Opto por expansion del espacio. A los 7 meses, ya evaluaba segundo punto con mucha mas informacion."],["52-60s","Las decisiones grandes merecen datos grandes. TrustMed es eso."]],video:[["0-3s","Talking head. 'Escucha esto.' Historia fascinante."],["3-12s","Dibuja en el aire las tres opciones con las manos."],["12-22s","Corte: 'Intuicion vs Datos' en split screen."],["22-35s","Screen recording del Simulador. Tres pestanas con ROI proyectado."],["35-45s","Zoom al escenario 'Segundo consultorio' con dato en rojo."],["45-52s","Regreso a talking head. Sonrie al contar el resultado."],["52-60s","Logo + CTA + texto animado final."]],screen:[["0s","3 escenarios simulados. Solo 1 tenia sentido."],["14s","Intuicion vs Datos: gran diferencia"],["25s","Simulador de Escenarios: ROI real proyectado"],["37s","Segundo consultorio = negativo en ano 1"],["55s","Decisiones grandes merecen datos grandes"]],cta:"Antes de tu proxima decision grande, simulala. Link en bio. 30 dias sin costo.",music:"Estilo 'discovery'. Sube cuando se revelan los datos del simulador."};
+REELS["dia-4-a"]={hook:"3 KPIs que tu competencia ya monitorea y que tu probablemente no tienes ni calculados.",voice:[["0-3s","3 KPIs que tu competencia ya monitorea y que tu probablemente no tienes ni calculados."],["3-8s","Voy rapido porque tu tiempo vale. Toma nota."],["8-18s","Numero uno: Ticket Promedio por Especialidad. No el general. Por cada linea de servicio. Ahi esta tu rentabilidad real."],["18-28s","Numero dos: Tasa de Retencion por Pagador. De cada 10 pacientes por esa EPS, cuantos vuelven en 6 meses? Si es bajo, el problema es el tipo de paciente que te trae ese pagador."],["28-38s","Numero tres: Dias de Cartera por Pagador. Cuantos dias entre que facturas y que te pagan? Mas de 60 dias = te estan financiando a ellos."],["38-48s","Los tres los calcula TrustMed automaticamente. Sin Excel. Sin formulas."],["48-55s","El consultorio que monitorea estos tres numeros tiene una ventaja real."]],video:[["0-3s","Talking head dinamico. Texto aparece con la frase."],["3-8s","Pattern interrupt: gesto de 'vamos, rapido.'"],["8-18s","Numero '1' en grande con texto. Medico habla."],["18-28s","Mismo formato con numero '2.'"],["28-38s","Mismo formato con numero '3.'"],["38-48s","Screen recording del dashboard mostrando los tres KPIs juntos."],["48-55s","Regreso a talking head para el cierre."]],screen:[["0s","3 KPIs que tu competencia ya mide."],["8s","1. Ticket Promedio por Especialidad"],["18s","2. Tasa de Retencion por Pagador"],["28s","3. Dias de Cartera por Pagador"],["40s","TrustMed los calcula automaticamente"]],cta:"Cuantos de estos tres tienes calculados? Comenta abajo. Link en bio.",music:"Musica energica tipo countdown. Ritmo rapido. Dinamica y moderna."};
+REELS["dia-4-b"]={hook:"Si no sabes tu punto de equilibrio mensual, no sabes si tu consultorio es viable. Punto.",voice:[["0-3s","Si no sabes tu punto de equilibrio mensual, no sabes si tu consultorio es viable. Punto."],["3-10s","El punto de equilibrio es el numero de consultas o ingresos que necesitas para cubrir TODOS tus costos fijos."],["10-20s","La mayoria lo sabe aproximado. 'Creo que necesito 40 pacientes.' Pero si el real es 52 y ves 41, estas perdiendo plata sin saberlo."],["20-32s","El modulo de Caja de TrustMed calcula tu punto de equilibrio real con tus numeros. Y lo cruza contra tu flujo actual."],["32-42s","Si estas por debajo, los Planes de Accion con IA te dan opciones concretas: reducir costos, ajustar mix, o subir tarifas."],["42-50s","No con consejos genericos. Con el analisis especifico de tu consultorio."],["50-58s","Conocer tu punto de equilibrio no es opcional. Es el primer paso."]],video:[["0-3s","Talking head. Pausa dramatica en 'Punto.'"],["3-10s","Infografia animada: balanza con costos vs ingresos."],["10-20s","Regreso talking head. Senala a camara en 'creo.'"],["20-32s","Screen recording del modulo de Caja. Calculo del PE con numeros."],["32-42s","Screen del Plan de Accion con IA."],["42-50s","Talking head de cierre. Tono empoderador."],["50-58s","Frase final en texto bold animado."]],screen:[["0s","No sabes tu PE = no sabes si eres viable"],["5s","PE = ingresos minimos para cubrir todo"],["20s","El 'creo' es el problema"],["30s","Caja: calcula tu PE con numeros reales"],["52s","Primer paso para sobrevivir: conocer tu numero"]],cta:"Cual es tu punto de equilibrio mensual? Si no lo sabes, link en bio.",music:"Inicio levemente tenso. Resolutiva y esperanzadora cuando aparece la solucion."};
+REELS["dia-4-c"]={hook:"El Simulador de Escenarios de TrustMed: como tomar decisiones de 100 millones con la misma calma con que decides el almuerzo.",voice:[["0-3s","El Simulador de Escenarios: decisiones de 100 millones con calma de almuerzo."],["3-12s","Voy a mostrarte como funciona. Un medico quiere evaluar si contratar un especialista asociado vale la pena."],["12-22s","En el simulador ingresas: costo mensual, ingresos proyectados, impacto en mix de pagadores, plazo de amortizacion. El sistema calcula en segundos."],["22-35s","El resultado: VAN del proyecto, TIR, punto de equilibrio del nuevo servicio, y proyeccion de flujo a 12 meses."],["35-45s","Si no te convence, cambias una variable. Medio tiempo? 40% particulares en vez del 20%? Lo ves en tiempo real."],["45-55s","Esto antes costaba una consultoria de varios millones. Ahora lo tienes integrado en tu dashboard."],["55-60s","Simula antes de invertir. Siempre."]],video:[["0-3s","Talking head. 'Voy a mostrarte algo.' Levanta pantalla."],["3-12s","Transicion a screen recording del Simulador."],["12-22s","Se llenan campos: costo, ingresos, mix, plazo."],["22-35s","Resultados aparecen animados: VAN, TIR, PE, flujo."],["35-45s","Se modifica variable. Resultados cambian en tiempo real."],["45-55s","Regreso a talking head. 'Esto antes costaba una consultoria.'"],["55-60s","Frase final animada sobre fondo oscuro."]],screen:[["0s","Decisiones de 100M con calma de almuerzo"],["14s","Simulador: ingresa tus variables reales"],["25s","VAN | TIR | Punto de equilibrio | Flujo 12 meses"],["37s","Cambia una variable. Ve el impacto en segundos."],["57s","Simula antes de invertir. Siempre."]],cta:"Usa el Simulador gratis 30 dias y toma tu proxima decision con datos. Link en bio.",music:"Tecno-corporativa. Aumenta levemente cuando se revelan resultados."};
+REELS["dia-5-a"]={hook:"MITO: El medico con mas pacientes gana mas. La realidad te va a incomodar.",voice:[["0-3s","MITO: El medico con mas pacientes gana mas. La realidad te va a incomodar."],["3-10s","He visto consultorios con 80 pacientes ganando menos que consultorios con 40. No es magia. Es matematica de pagadores y precios."],["10-20s","El 70% de pacientes por EPS con tiempos de pago de 120 dias y glosas del 18% = tu consultorio subvenciona el sistema de salud."],["20-32s","La rentabilidad no la determina cuantos entran. La determina cuanto queda despues de que te paguen, cuanto tarda, y cuanto te descuentan."],["32-42s","Con TrustMed tienes el Ticket Promedio real, margen por pagador, y Score de cada uno."],["42-52s","No es cuantos. Es cuales. Y a que precio. Con que condiciones de pago."],["52-58s","El consultorio que mas gana no es el mas lleno. Es el mejor gestionado."]],video:[["0-3s","Pattern interrupt: 'MITO' en rojo con sonido de buzzer. Luego medico entra."],["3-10s","Talking head. Levanta una ceja. 'Esto va a sorprenderte.'"],["10-20s","Infografia: dos consultorios. Uno con 80 (lleno), otro con 40 pero mas dinero."],["20-32s","Talking head. Gesticula enfaticamente."],["32-42s","Screen recording rapido del dashboard con tres KPIs."],["42-52s","Talking head. 'No es cuantos. Es cuales.' Con pausa."],["52-58s","Texto bold animado. Logo TrustMed."]],screen:[["0s","MITO: mas pacientes = mas dinero"],["3s","REALIDAD: te va a incomodar"],["18s","70% EPS + mora 120 dias + glosas 18% = perder plata"],["33s","Ticket Promedio + Margen por Pagador + Score"],["55s","El mas lleno vs el mejor gestionado"]],cta:"Comenta: cuantos pacientes al mes y si el ingreso lo refleja. Link en bio.",music:"Comienza con buzzer al mostrar el mito. Transicion a revelacion. Ritmo ascendente."};
+REELS["dia-5-b"]={hook:"MITO: Si el mes estuvo ocupado, el mes estuvo bien. Eso es exactamente lo que te esta hundiendo.",voice:[["0-3s","MITO: Si el mes estuvo ocupado, el mes estuvo bien. Eso te esta hundiendo."],["3-10s","Ocupado no es rentable. Puede ser la forma mas eficiente de perder plata."],["10-20s","Cuando facturas por EPS, eso no es plata en tu cuenta. Es una promesa de pago. A veces a 90 dias. A veces con glosas. A veces nunca."],["20-30s","Y mientras esperas, tu ya pusiste el tiempo, la energia, el insumo, el personal. Ya saliste de caja."],["30-40s","El modulo de Caja te muestra la diferencia entre lo facturado y lo cobrado realmente. Ese numero es el real."],["40-50s","Muchos medicos descubren que su 'mejor mes' en facturacion fue un mes de flujo negativo porque nada habia cobrado todavia."],["50-58s","Ocupado no es rentable. Cobrado es rentable."]],video:[["0-3s","Texto animado contundente. 'MITO' en rojo explosivo."],["3-10s","Talking head. Gesto de 'voy a decirte algo que necesitas saber.'"],["10-20s","Animacion: factura sale hacia la EPS. '90 dias?' '15% glosas?' 'Nunca?'"],["20-30s","Talking head. Cuenta: 'tiempo, energia, insumos, personal.'"],["30-40s","Screen recording de Caja. 'Facturado' (alta) vs 'Cobrado real' (baja)."],["40-50s","Talking head. Cara de impacto en 'flujo negativo.'"],["50-58s","Frase final en texto bold. Logo."]],screen:[["0s","MITO: mes ocupado = mes bien."],["3s","Eso te esta hundiendo."],["12s","Facturado no es cobrado"],["32s","Caja: Facturado vs Cobrado real"],["52s","Ocupado no es rentable. Cobrado es rentable."]],cta:"Cuanto de lo que facturaste ya entro a tu cuenta? Si no lo sabes, link en bio.",music:"Inicio con tension. Transicion esperanzadora cuando aparece Caja."};
+REELS["dia-5-c"]={hook:"MITO: Para crecer necesitas mas pacientes. Realidad: probablemente necesitas menos, pero mejores.",voice:[["0-3s","MITO: Para crecer necesitas mas pacientes. Realidad: necesitas menos, pero mejores."],["3-12s","El crecimiento mas sostenible viene de optimizar el valor por paciente y el mix de pagadores, no de llenar la agenda a cualquier costo."],["12-22s","Los consultorios estrategicos analizan cual es su segmento mas rentable, que pagador lo trae, y duplican esfuerzos en esa combinacion."],["22-35s","TrustMed: Analisis de Pagadores + Ticket Promedio te muestra que combinacion genera mas margen real. El Simulador proyecta que pasa si cambias tu mix."],["35-45s","Un consultorio que cambia del 70% EPS al 50% EPS + prepagada premium no necesita crecer en volumen. Matematicamente."],["45-55s","Crecer en volumen sin estrategia: trabajar mas para ganar igual. Crecer en calidad de mix: trabajar igual para ganar mas."],["55-60s","Eso es estrategia de crecimiento real. Eso es TrustMed."]],video:[["0-3s","Talking head. Levanta el dedo en 'menos, pero mejores.'"],["3-12s","Infografia: dos lineas de crecimiento. Volumen masivo vs moderado rentable."],["12-22s","Talking head. Dibuja en el aire: 'paciente rentable + pagador correcto.'"],["22-35s","Screen recording: Analisis de Pagadores + Ticket Promedio juntos."],["35-45s","Animacion: pastel cambia de '70% EPS' a mix optimizado. Numeros suben."],["45-55s","Talking head de cierre. Tono seguro y estrategico."],["55-60s","Texto animado final. Logo."]],screen:[["0s","MITO: crecer = mas pacientes"],["3s","Realidad: menos, pero mejores"],["15s","Paciente rentable + pagador correcto = multiplicador"],["28s","Analisis de Pagadores + Ticket Promedio = combinacion ganadora"],["57s","Crecer en calidad de mix = trabajar igual, ganar mas"]],cta:"Que mix de pagadores tienes? Comenta. Link en bio para analizarlo con datos.",music:"Sofisticada. Estilo 'strategy session.' Tempo medio. Cierra positiva."};
+REELS["dia-6-a"]={hook:"Te muestro en 45 segundos el TrustMap y como cambia la forma en que ves tu competencia para siempre.",voice:[["0-3s","Te muestro en 45 segundos el TrustMap."],["3-10s","Entra a TrustMed, vas al TrustMap, y lo primero que aparece es tu ciudad con tu consultorio en el centro."],["10-20s","Cada pin es un consultorio de tu especialidad. Verde es baja competencia, amarillo media, rojo alta. De un vistazo sabes tu situacion."],["20-30s","Haces clic en cualquier pin: especialidad, rango de precio, servicios. Sin salir de la plataforma."],["30-40s","El circulo azul eres tu. Ajustas radio: 1km, 2km, 5km. El mapa te dice cuantos competidores directos en cada radio."],["40-50s","Pricing Intelligence sabe con quien compararte. No con el promedio nacional. Con los que estan a la vuelta de tu esquina."],["50-58s","Esto es lo que las grandes clinicas tienen. Ahora lo tienes tu."]],video:[["0-3s","Talking head. Levanta celular: 'mira esto.'"],["3-10s","Screen recording. Entrada al TrustMap."],["10-20s","Mapa aparece con pins. Zoom out de la ciudad."],["20-30s","Clic en un pin. Info flotante aparece."],["30-40s","Slider de radio. Circulo se expande. Contador cambia."],["40-50s","Se activa Pricing Intelligence desde el mapa."],["50-58s","Regreso a talking head. Gesto de 'ya saben.'"]],screen:[["0s","TrustMap en 45 segundos"],["12s","Verde = poca competencia | Rojo = saturacion"],["22s","Clic en cualquier competidor: precio y servicios"],["33s","Tu radio: 1km, 2km, 5km"],["52s","Lo que tienen las grandes clinicas. Ahora tuyo."]],cta:"Ve tu propio TrustMap hoy. Link en bio. 30 dias gratis.",music:"Tech energica. Sonidos de UI sincronizados. Producto moderno y fluido."};
+REELS["dia-6-b"]={hook:"La herramienta que mas rapido ayuda a un consultorio en crisis no es la mas glamorosa. Es el modulo de Caja.",voice:[["0-3s","La herramienta que mas rapido ayuda en crisis: el modulo de Caja."],["3-12s","No el dashboard de KPIs. No el mapa. El modulo de Caja. Cuando estas en crisis, necesitas ver exactamente adonde va la plata."],["12-22s","Te muestra tres cosas: ingresos reales cobrados, egresos por categoria, y saldo proyectado semana a semana para los proximos 30 dias."],["22-32s","Ese saldo proyectado cambia todo. Te dice con antelacion si en la semana 3 tendras un hueco de liquidez. Antes de que pase."],["32-42s","Con eso puedes: acelerar cobros, diferir gastos, negociar un anticipo. Tienes tiempo de reaccion."],["42-52s","Sin ese dato: panico. Con ese dato: un plan."],["52-58s","La diferencia entre sobrevivir una crisis y no: anticipacion vs reaccion."]],video:[["0-3s","Talking head. 'No es lo que esperas pero es lo que necesitas.'"],["3-12s","Habla con conviccion y empatia."],["12-22s","Screen recording de Caja. Tres secciones claras: Ingresos, Egresos, Saldo."],["22-32s","Zoom al saldo proyectado. Semana 3 baja. Circulo rojo animado."],["32-42s","Texto overlay: 'Acelerar cobros | Diferir gastos | Negociar anticipo.'"],["42-52s","Split screen: medico en panico vs medico tranquilo con dashboard."],["52-58s","Texto final animado. Logo."]],screen:[["0s","La herramienta mas importante en crisis: Caja"],["14s","Ingresos reales | Egresos | Saldo 30 dias"],["24s","Hueco de liquidez detectado: semana 3"],["35s","Actua ANTES del hueco. No despues."],["54s","Anticipacion vs Reaccion"]],cta:"Si tu caja esta apretada o no la ves claramente, link en bio. 30 dias gratis.",music:"Tension controlada. Urgencia sin desesperacion. Cierra resolutiva."};
+REELS["dia-6-c"]={hook:"El Simulador de Escenarios: la herramienta que todo medico deberia usar antes de gastar mas de 10 millones de pesos.",voice:[["0-3s","El Simulador: usalo antes de cualquier decision de mas de 10 millones."],["3-12s","Caso real: un medico evalua si contratar auxiliar de enfermeria full time o part time."],["12-22s","Cargamos el escenario. Salario full time 3.2M con prestaciones. Incremento de capacidad: 20%. Mix de pagadores actual."],["22-32s","El simulador calcula: impacto en flujo mes a mes, punto de equilibrio de la contratacion, ingreso adicional neto."],["32-42s","Ahora part time: 1.8M, capacidad +10%. El simulador actualiza todo. Comparas lado a lado."],["42-52s","Full time: equilibrio en mes 4. Part time: mes 2 pero techo mas bajo. Decision depende de tu objetivo."],["52-60s","Eso ya no es instinto. Es decision de datos. Eso es TrustMed."]],video:[["0-3s","Talking head con autoridad."],["3-12s","Transicion a screen recording del Simulador."],["12-22s","Se llenan campos en tiempo real."],["22-32s","Resultados aparecen animados: flujo 12 meses, PE, ingreso neto."],["32-42s","Se cambia a part time. Numeros se actualizan. Boton 'Comparar escenarios.'"],["42-52s","Split screen: dos escenarios con flechas senalando diferencias."],["52-60s","Regreso talking head. Sonrie con satisfaccion."]],screen:[["0s","Antes de gastar +10M: simula primero."],["14s","Simulador: ingresa variables reales"],["24s","Resultado: flujo 12 meses + PE + ingreso neto"],["35s","Comparar: full time vs part time"],["55s","Instinto vs Datos. Tu decides."]],cta:"Que decision financiera tienes pendiente? Simulala primero. Link en bio.",music:"Corporativa moderna con beats suaves. Sonidos de interfaz. Profesional."};
+REELS["dia-7-a"]={hook:"El medico que lidera su mercado en 2026 no es el mejor clinicamente. Es el mejor informado.",voice:[["0-3s","El medico que lidera en 2026 no es el mejor clinicamente. Es el mejor informado."],["3-12s","Y eso puede sonar injusto. Estudiaste anos para ser excelente. Pero el mercado premia a quien toma mejores decisiones de negocio con mayor velocidad."],["12-22s","Los consultorios que lideran tienen algo en comun: saben cuanto cobra su competencia, que pagadores son rentables, cuando subir precios, y si su flujo tendra un problema."],["22-32s","Eso no es suerte. Es informacion en tiempo real. Y ya esta disponible para un consultorio independiente como el tuyo."],["32-42s","TrustMed existe porque los medicos de alta performance merecen las mismas herramientas que las grandes clinicas. Sin el presupuesto."],["42-52s","Tu proxima jugada no es ver mas pacientes. Es ver mejor tus datos."],["52-60s","El liderazgo de mercado no se espera. Se construye. Con datos. Semana a semana."]],video:[["0-3s","Talking head cinematografico. Iluminacion perfecta. Visionario."],["3-12s","Mismo plano. Pasion contenida."],["12-22s","Montaje rapido: dashboard, mapa, grafico subiendo, medico sonriendo."],["22-32s","Talking head. Tono de promesa."],["32-42s","Animacion: 'grandes clinicas' tachado, sustituido por 'TU consultorio.'"],["42-52s","Energia creciente. Sube la voz levemente."],["52-60s","Plano final cinematografico. Logo TrustMed."]],screen:[["0s","El medico que lidera: el mejor informado."],["14s","Saben precios, pagadores rentables, flujo."],["34s","Herramientas de grandes clinicas. Para tu consultorio."],["44s","Tu proxima jugada: ver mejor tus datos"],["55s","El liderazgo se construye. Con datos."]],cta:"Si quieres liderar tu mercado este ano, empieza esta semana. Link en bio.",music:"Inspiracional con orquestacion creciente. Epic corporate motivation."};
+REELS["dia-7-b"]={hook:"Llevas meses sintiendo que trabajas mucho y tienes poco que mostrar. Eso va a cambiar.",voice:[["0-3s","Llevas meses sintiendo que trabajas mucho y tienes poco que mostrar. Eso va a cambiar."],["3-12s","No porque mejoren solas las cosas. Sino porque estas buscando una forma diferente. Eso ya es la mitad del camino."],["12-22s","Los medicos en crisis no son malos medicos. Nadie les enseno a manejar un negocio de salud. Medicina clinica y gestion financiera son dos mundos diferentes."],["22-32s","Las herramientas que existian eran muy caras, complicadas, o no existian para nuestra realidad colombiana y latinoamericana."],["32-42s","TrustMed nacio para ser el copiloto financiero de tu consultorio. Te dice con datos donde esta el problema. Te muestra como salir. Monitorea tu progreso."],["42-52s","No tienes que resolver esto solo. Un dato hoy. Una decision mejor esta semana. Un mes diferente el proximo mes."],["52-60s","El consultorio que mereces construir todavia esta ahi. Solo necesitas los datos correctos."]],video:[["0-3s","Talking head intimo. Camara muy cerca. Iluminacion calida."],["3-12s","Asiente mientras habla, creando conexion."],["12-22s","Texto animado: 'No son malos medicos. Nadie les enseno.'"],["22-32s","Regreso talking head. Solidaridad."],["32-42s","Secuencia de producto: dashboard, Plan de Accion, grafico de progreso."],["42-52s","Talking head. Tono empoderador y cercano."],["52-60s","Sonrie con esperanza. Texto + logo."]],screen:[["0s","Trabajas mucho. Poco que mostrar. Eso cambia."],["14s","Nadie les enseno a gestionar un consultorio."],["33s","Tu copiloto financiero: TrustMed"],["44s","Un dato hoy. Una decision mejor esta semana."],["55s","El consultorio que mereces esta ahi."]],cta:"El primer paso: ver el panorama completo. Link en bio. 30 dias gratis.",music:"Calida y esperanzadora. Piano o guitarra acustica. Resolucion positiva."};
+REELS["dia-7-c"]={hook:"Como se ve un consultorio gestionado con datos en 3 anos? Te cuento la vision.",voice:[["0-3s","Como se ve un consultorio gestionado con datos en 3 anos? Te cuento."],["3-12s","Imagina que cada decision esta respaldada por datos propios. Sabes cuanto vales por hora, que pagadores dan mas margen, que servicios tienen potencial en tu zona."],["12-22s","Antes de abrir segundo punto, ya corriste numeros tres veces. Tu contador no te sorprende. Tu flujo lo lees como un ECG: con precision y sin ansiedad."],["22-32s","Puedes crecer no atendiendo mas sino eligiendo mejor: que pacientes, que pagadores, que servicios segun demanda y oferta de tu zona."],["32-42s","Eso es resultado de tomar mejores decisiones de manera consistente. Y las mejores decisiones requieren los mejores datos."],["42-52s","En TrustMed creemos que los medicos colombianos merecen gestionar sus consultorios con la misma inteligencia con que ejercen su medicina."],["52-60s","La pregunta no es si quieres ese consultorio. La pregunta es cuando empiezas a construirlo."]],video:[["0-3s","Talking head cinematografico. Vision y conviccion."],["3-12s","Fondo transiciona a consultorio moderno con pantalla limpia."],["12-22s","Secuencia 'day in the life': celular con dashboard, decision calmada, reunion."],["22-32s","Texto aspiracional: 'Elegir mejor. Priorizar con datos. Especializarse.'"],["32-42s","Talking head. Conviccion creciente."],["42-52s","Logo TrustMed aparece suavemente. Medico habla sobre el."],["52-60s","Plano final. Determinacion. Frase en texto. Fade out con logo."]],screen:[["0s","Tu consultorio con datos: vision a 3 anos"],["6s","Cada decision respaldada por tus numeros"],["18s","Flujo de caja que lees como un ECG: sin ansiedad"],["34s","Mejores decisiones consistentes = crecimiento real"],["55s","Cuando empiezas a construirlo?"]],cta:"La vision empieza con el primer dato real. Link en bio. 30 dias gratis.",music:"Inspiracional sofisticada. Crescendo gradual. Tono de 'el futuro es posible.'"};
+
+// ========== RENDER REEL FUNCTION ==========
+function renderReel(containerId, data) {
+    const c = document.getElementById(containerId);
+    if (!c || !data) return;
+    const segType = containerId.split('-').pop();
+    const typeClass = {a:'type-a',b:'type-b',c:'type-c'}[segType]||'type-a';
+    let voiceLines = data.voice.map(v=>`<div class="reel-line"><span class="reel-ts">${v[0]}</span><span class="reel-txt">${v[1]}</span></div>`).join('');
+    let videoLines = data.video.map(v=>`<div class="reel-video-line"><span class="reel-video-ts">${v[0]}</span><span>${v[1]}</span></div>`).join('');
+    let screenItems = data.screen.map(s=>`<div class="reel-screen-item"><span class="reel-screen-time">${s[0]}</span><span class="reel-screen-val">${s[1]}</span></div>`).join('');
+    let fullVoice = data.voice.map(v=>v[1]).join('\n\n');
+    c.innerHTML = `
+        <div class="reel-hook" data-copy>${data.hook}</div>
+        <div class="section-block"><div class="section-head"><h3><span class="reel-badge voice">GUION DE VOZ</span> Texto narrado completo</h3><button class="copy-btn" onclick="copyText(\`${fullVoice.replace(/`/g,"'").replace(/\\/g,"\\\\")}\`,this)">Copiar Guion</button></div><div class="section-body"><div class="reel-timeline">${voiceLines}</div></div></div>
+        <div class="section-block"><div class="section-head"><h3><span class="reel-badge video">DIRECCION VIDEO</span> Escena por escena</h3></div><div class="section-body"><div class="reel-video-dir">${videoLines}</div></div></div>
+        <div class="section-block"><div class="section-head"><h3><span class="reel-badge screen">TEXTO EN PANTALLA</span> Overlays clave</h3></div><div class="section-body"><div class="reel-screen-texts">${screenItems}</div></div></div>
+        <div class="section-block"><div class="section-head"><h3><span class="reel-badge cta">CTA FINAL</span></h3><button class="copy-btn" onclick="copyText(\`${data.cta.replace(/`/g,"'")}\`,this)">Copiar CTA</button></div><div class="section-body"><div class="reel-cta-box">${data.cta}</div></div></div>
+        <div class="section-block"><div class="section-head"><h3><span class="reel-badge music">MUSICA / AUDIO</span></h3></div><div class="section-body"><div class="reel-music">${data.music}</div></div></div>
+    `;
+}
+
+// Initialize all reels
+document.addEventListener('DOMContentLoaded', function(){
+    Object.keys(REELS).forEach(k => renderReel('reel-'+k, REELS[k]));
+});
+
+// ========== CORE FUNCTIONS ==========
+function showPage(id) {
+    document.querySelectorAll('.page-section').forEach(p => p.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    event.currentTarget.classList.add('active');
+    document.querySelector('.main').scrollTop = 0;
+}
+
+function showSeg(dia, seg, btn) {
+    ['a','b','c'].forEach(s => {
+        const el = document.getElementById(dia + '-' + s);
+        if (el) el.style.display = s === seg ? 'block' : 'none';
+    });
+    btn.closest('.seg-tabs').querySelectorAll('.seg-tab').forEach(t => {
+        t.className = 'seg-tab';
+    });
+    btn.classList.add('active-' + seg);
+}
+
+function switchFormat(dia, fmt, btn) {
+    const page = document.getElementById(dia);
+    if (!page) return;
+    page.querySelectorAll('.format-post').forEach(el => el.style.display = fmt === 'post' ? 'block' : 'none');
+    page.querySelectorAll('.format-reel').forEach(el => el.style.display = fmt === 'reel' ? 'block' : 'none');
+    btn.closest('.format-toggle').querySelectorAll('.fmt-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+}
+
+function copyText(text, btn) {
+    navigator.clipboard.writeText(text).then(() => {
+        btn.classList.add('copied');
+        btn.textContent = 'Copiado!';
+        showToast('Copiado al portapapeles');
+        setTimeout(() => { btn.classList.remove('copied'); btn.textContent = 'Copiar'; }, 2000);
+    });
+}
+
+function copySibling(btn) {
+    const block = btn.closest('.section-block');
+    const target = block.querySelector('[data-copy]');
+    if (target) {
+        const text = target.innerText || target.textContent;
+        navigator.clipboard.writeText(text).then(() => {
+            btn.classList.add('copied');
+            const orig = btn.textContent;
+            btn.textContent = 'Copiado!';
+            showToast('Copiado al portapapeles');
+            setTimeout(() => { btn.classList.remove('copied'); btn.textContent = orig; }, 2000);
+        });
+    }
+}
+
+function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+}
+</script>
+</body>
+</html>
